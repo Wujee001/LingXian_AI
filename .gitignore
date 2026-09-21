@@ -1,0 +1,76 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# ===== 虚拟环境 =====
+.venv/
+venv/
+env/
+ENV/
+
+# ===== 模型权重（走GitHub Release，不进Git）=====
+backend/models/*.pth
+backend/models/*.pt
+backend/models/*.onnx
+backend/models/*.h5
+backend/models/*.ckpt
+backend/models/class_mapping.json
+backend/models/best_model*
+
+# ===== 训练产物（模型线本地生成，不进Git）=====
+runs/
+checkpoints/
+wandb/
+lightning_logs/
+*.tensorboard
+
+# ===== 临时上传 =====
+backend/temp_upload/*
+!backend/temp_upload/.gitkeep
+
+# ===== 运行日志 =====
+logs/
+*.log
+backend/logs/*
+!backend/logs/.gitkeep
+
+# ===== 数据集图片（走网盘，不进Git）=====
+data/dataset/*
+!data/dataset/.gitkeep
+*.zip
+*.rar
+*.7z
+
+# ===== 前端 =====
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===== 数据库 =====
+*.db
+*.db3
+*.sqlite
+*.sqlite3
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+Desktop.ini

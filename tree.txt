@@ -1,0 +1,152 @@
+LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根目录
+│
+│  .gitignore                              # Git忽略规则（权重/数据集/node_modules/db/logs）
+│  README.md                               # 项目说明 + 启动步骤
+│  requirements.txt                        # Python后端依赖清单
+│  tree.txt                                # 项目目录树（本文件）
+│
+├─backend/                                 # ===== FastAPI 后端 =====
+│  │  main.py                              # FastAPI入口（挂载路由 + CORS）
+│  │  __init__.py                          # 后端包标识
+│  │
+│  ├─api/                                  # 接口路由层
+│  │      knowledge.py                     # 知识库查询/浏览接口
+│  │      single_char.py                   # 单减字识别+解析接口（V1核心）
+│  │      whole_sheet.py                   # 整谱打谱接口（V1占位，V2接检测）
+│  │      judou.py                         # 智能句读接口 /api/judou/segment（输入减字序列→逐字边界标签+置信度）
+│  │      __init__.py                      # 路由包标识
+│  │
+│  ├─core/                                 # 配置与静态资源
+│  │      config.py                        # 全局配置（全部相对路径，禁写死盘符）
+│  │      jianzipu_lib.json                # 减字语义知识库（减字→左右手/徽位/释义）
+│  │      __init__.py                      # core包标识
+│  │
+│  ├─data/                                 # 后端数据
+│  │      class_registry.csv               # 类别主表（拼音key+中文显示，软件/模型共用）
+│  │
+│  ├─logs/                                 # 运行日志输出目录（.gitignore）
+│  │      .gitkeep                         # 空目录占位
+│  │
+│  ├─models/                               # 模型权重目录（.gitignore，走GitHub Release）
+│  │      .gitkeep                         # 空目录占位
+│  │
+│  ├─modules/                              # ===== 智能句读算法模块 =====
+│  │  │  __init__.py
+│  │  │
+│  │  ├─state_transfer/                    # 数学建模：演奏状态转移
+│  │  │      feature_extractor.py          # Δz 特征提取（换弦/徽位变化/指法连续度等数值向量）
+│  │  │      baseline_model.py             # 可解释基线模型（Logistic/专家规则，消融对照用）
+│  │  │      __init__.py
+│  │  │
+│  │  ├─judou/                             # 汉语言句读启发特征
+│  │  │      rules.py                      # 句读规则打分（结构完整度/边界标志/层级/歧义度）
+│  │  │      features.py                   # 合成句读启发向量 q_i
+│  │  │      __init__.py
+│  │  │
+│  │  └─sequence/                          # 序列融合与决策
+│  │         fusion.py                     # 特征融合 [z_i, Δz_i, q_i]
+│  │         transformer_model.py          # 轻量序列模型，输出 C/S/L/E 概率
+│  │         decision.py                   # 决策引擎（maxP<τ → U 人工复核，概率约束校验）
+│  │         __init__.py
+│  │
+│  ├─service/                              # 业务逻辑层
+│  │      classifier.py                    # 图像分类器（假模型→真模型唯一替换点 predict()）
+│  │      parser.py                        # 减字解析（识别结果→查知识库→演奏状态 z_i）
+│  │      registry.py                      # 类别注册表加载（读取 class_registry.csv）
+│  │      __init__.py                      # service包标识
+│  │
+│  ├─temp_upload/                          # 用户上传图片临时目录（.gitignore）
+│  │      .gitkeep                         # 空目录占位
+│  │
+│  └─utils/                                # 通用工具模块
+│          mlnlog.py                       # 日志系统（彩色控制台+文件持久化+热重载）
+│          __init__.py                     # utils包标识
+│
+├─data/                                    # ===== 数据集 =====
+│  └─dataset/                              # 裁剪单字图片（文件夹名=拼音类别，走网盘不进Git）
+│          .gitkeep                        # 空目录占位
+│
+├─docs/                                    # ===== 项目文档 =====
+│      团队分工.md                          # 协作分工 + Git分支规范
+│      接口契约.md                          # 软件↔模型接缝契约（交付物清单）
+│      项目规划.md                          # V1→V3迭代路线 + 四周排期
+│      句读规则手册.md                      # 句读原则→可计算字段映射表（上下文/结构完整/标志结构/层级/歧义）
+│
+├─frontend/                                # ===== Vue3 + Element-Plus 前端 =====
+│  │  index.html                           # HTML入口
+│  │  package.json                         # 前端依赖配置
+│  │  vite.config.js                       # Vite配置（/api 代理到后端8001端口）
+│  │
+│  └─src/                                  # 前端源码
+│      │  App.vue                          # 根组件（国风导航布局）
+│      │  main.js                          # 前端入口（挂载ElementPlus + 路由）
+│      │  style.css                        # 全局国风样式（宣纸+墨色+朱砂）
+│      │
+│      ├─api/                              # API请求封装
+│      │      index.js                     # axios统一封装（识别/知识库/整谱/句读接口）
+│      │
+│      ├─components/                       # 公共组件
+│      │      .gitkeep                     # 空目录占位
+│      │
+│      ├─router/                           # 路由配置
+│      │      index.js                     # 路由表（/single 单字 /whole 整谱 /judou 句读）
+│      │
+│      └─views/                            # 页面
+│              SingleChar.vue              # 【单减字解析】V1核心演示页面
+│              WholeSheet.vue              # 【整谱打谱】UI完整，接口占位
+│              JudouSegment.vue            # 【智能句读】逐字边界标注页（C/S/L/E/U 可视化+人工复核）
+│
+├─scripts/                                 # ===== 训练脚本 =====
+│      train_colab.ipynb                   # Colab/AI Studio 迁移学习脚本（ResNet18 单字分类）
+│      train_sequence.ipynb                # 句读序列模型训练脚本（Baseline/Transformer 消融对照）
+│
+└─tests/                                   # ===== 测试 =====
+        .gitkeep                           # 空目录占位
+
+
+============================================================
+  关键说明
+============================================================
+
+【C/S/L/E/U 边界标签】（标记两个相邻减字之间的停顿）
+  C Continue  连续   —— 不建议停顿，演奏连贯
+  S Short     短停   —— 弱边界，非句末小停顿
+  L Long      长停   —— 强边界，非句末大停顿
+  E End       句末   —— 完整谱乐句结束
+  U Review    复核   —— 非音乐标签；置信度低或存在专业歧义时转人工
+  约束：P(E) ≤ P(S)+P(L)+P(E)，保证"不是边界却判为句末"的逻辑矛盾不出现
+
+【三层技术架构】
+  第一层 演奏语义层：减字 → parser → 演奏状态 z_i（左手/右手/弦/徽/散按泛）
+  第二层 结构句读层：
+        古琴知识 → state_transfer/feature_extractor → 状态转移 Δz_i
+        汉语言句读 → judou/rules+features → 句读启发特征 q_i
+  第三层 序列推断层：fusion 拼接 [z_i, Δz_i, q_i] → sequence/transformer_model → P(C/S/L/E)
+                    → decision 按阈值与约束输出标签，低置信/歧义 → U
+
+【双模型对照（消融实验，写论文用）】
+  Baseline：baseline_model.py 仅用 Δz_i，可解释、易复现
+  序列模型：transformer_model.py 用 [z_i, Δz_i, q_i] 学习上下文
+  两者对比：证明领域特征与序列建模各自贡献，无论谁高都可成结论
+
+【模型可插拔原则】
+  classifier.predict()、baseline_model、transformer_model 均为独立替换点
+  上层接口、decision、前端不动，仅替换内部实现即可切换模型
+
+【视觉与乐理分离原则】
+  视觉模型只认字形（输出拼音 class_key）
+  乐理全部交给 jianzipu_lib.json（左手弦/徽 + 右手指法 + 释义）
+  class_registry.csv 为软件与模型共用的唯一类别主表
+
+【端口约定】
+  后端 FastAPI：http://127.0.0.1:8001
+  前端 Vite：   http://127.0.0.1:5173
+  API文档：     http://127.0.0.1:8001/docs
+
+【启动命令】
+  后端：conda activate lingxian
+        cd backend
+        uvicorn main:app --reload --host 127.0.0.1 --port 8001
+  前端：cd frontend
+        npm install
+        npm run dev
