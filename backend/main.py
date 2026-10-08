@@ -39,7 +39,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 路由注册
 app.include_router(whole_sheet.router, prefix="/api/sheet", tags=["整谱打谱"])
-# app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"])
+app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"])
 app.include_router(knowledge.router, prefix="/api/knowledge", tags=["知识库"])
 # app.include_router(judou.router, prefix="/api/judou", tags=["智能句读"])
 

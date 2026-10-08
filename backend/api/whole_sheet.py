@@ -43,9 +43,8 @@ class SheetItem(BaseModel):
 
 
 class SheetResp(BaseModel):
-    code: int
-    image_url: str
-    items: list
+    success: bool
+    data: dict
 
 
 @router.post("/upload", response_model=SheetResp)
@@ -81,9 +80,11 @@ async def sheet_upload(file: UploadFile = File(...)):
             MLN_LOG_EXCEPTION("第%d框处理异常：%s", i, e)
 
     return {
-        "code": 0,
-        "image_url": f"/static/upload/{file.filename}",
-        "items": items,
+        "success": True,
+        "data": {
+            "image_url": f"/static/upload/{file.filename}",
+            "items": items,
+        },
     }
 
 
@@ -103,7 +104,7 @@ async def sheet_correct(payload: dict):
         payload.get("confirmed_key"),
     )
     # TODO: 写入 SQLite 修正表，供模型线迭代训练
-    return {"code": 0, "msg": "修正已记录"}
+    return {"success": True, "data": {"msg": "修正已记录"}}
 
 
 def _crop_and_predict(sheet_img: Image.Image, box: dict) -> list:
