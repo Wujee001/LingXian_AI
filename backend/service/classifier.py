@@ -25,7 +25,7 @@ def predict_crop(pil_img):
         Top-3 候选 [(class_key, 置信度), ...]
     """
     return [
-        ("san_gou3", 0.82),
-        ("da9_gou4", 0.11),
-        ("san_tiao2", 0.04),
+        ("da_9_gou_4", 0.82),
+        ("san_tiao_7", 0.11),
+        ("gou_5", 0.04),
     ]

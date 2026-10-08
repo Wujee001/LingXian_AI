@@ -21,9 +21,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api import whole_sheet
-# 以下路由模块就绪后放开注释：
-# from api import single_char, knowledge, judou
+from api import whole_sheet, single_char, knowledge, judou
 
 app = FastAPI(title="LingXianAI 泠弦智谱", version="1.0.0")
 
@@ -42,7 +40,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # 路由注册
 app.include_router(whole_sheet.router, prefix="/api/sheet", tags=["整谱打谱"])
 # app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"])
-# app.include_router(knowledge.router, prefix="/api/kb", tags=["知识库"])
+app.include_router(knowledge.router, prefix="/api/knowledge", tags=["知识库"])
 # app.include_router(judou.router, prefix="/api/judou", tags=["智能句读"])
 
 

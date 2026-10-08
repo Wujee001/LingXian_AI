@@ -40,7 +40,7 @@ def _load_lib() -> dict:
 def char_parse(class_key: str) -> dict:
     """
     入参：
-        class_key：减字拼音编码，如 san_gou3
+        class_key：减字拼音编码，如 da_9_gou_4
     返回：
         演奏解析 {class_key, display_name, left_hand, right_hand, meaning}
     """
