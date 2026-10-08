@@ -113,7 +113,7 @@
 import SheetCanvas from '../components/SheetCanvas.vue'
 import { logInfo, logWarn } from '../logger.js'
 
-const KEY_POOL = ['san_gou3', 'da9_gou4', 'san_tiao2', 'ming10_gou3', 'da9_tiao4']
+const KEY_POOL = ['da_9_gou_4', 'san_tiao_7', 'gou_5', 'ming_10_gou_5', 'tiao_6']
 
 export default {
   name: 'WholeSheet',
