@@ -1,142 +1,411 @@
 /* -*- coding: utf-8 -*-
  *
- * 全局国风样式模块（泠弦智谱 V1）
+ * 全局国风样式模块（泠弦智谱 V2 · 古籍抄本质感）
  *
- * 定义宣纸底色、墨色文字、朱砂主色、竹青辅色、标题楷体，
- * 并轻量定制 Element-Plus 按钮、卡片、标签为国风质感。
+ * 宣纸底 + 赭石/墨黑/暗棕/灰青低饱和主色；
+ * 木牌按钮、朱砂印章、册页容器、古籍宋体正文。
+ * 弱化科技感，无发光/霓虹/全息。
  *
  * 作者：
  *     @Wujee
  *
  * 创建日期：2026-10-1
- * 版本：1.0.0
+ * 版本：2.0.0
  *
  * 许可证：内部使用，未经许可不得传播。
  *
  */
 
 :root {
-  --ink: #2b2620;          /* 墨色 */
-  --ink-soft: #5c5347;     /* 淡墨 */
-  --xuan: #f5efe1;         /* 宣纸 */
-  --xuan-card: #fbf7ee;    /* 卡片宣纸 */
-  --zhusha: #b23a2e;       /* 朱砂 */
-  --zhusha-deep: #932f25;  /* 深朱砂 */
-  --zhuqing: #5e7d6a;      /* 竹青 */
-  --jin: #b8860b;          /* 古金 */
-  --line: #e0d6c2;         /* 细线 */
+  /* 纸 */
+  --paper:       #e9dec3;
+  --paper-light: #f3ead6;
+  --paper-warm:  #efe4cb;
+  --paper-deep:  #dccfb0;
+  --paper-edge:  #c9b892;
+
+  /* 墨 */
+  --ink:       #1f1a15;
+  --ink-soft:  #4a4034;
+  --ink-mute:  #7a6d5c;
+  --ink-faint: #a89a85;
+
+  /* 赭石 */
+  --zheshi:       #8b5a2b;
+  --zheshi-deep:  #6b4420;
+  --zheshi-light: #a57045;
+
+  /* 朱砂 */
+  --zhusha:      #9c3a2e;
+  --zhusha-deep: #7a2a20;
+  --zhusha-soft: rgba(156, 58, 46, 0.08);
+
+  /* 灰青 */
+  --huiqing:      #5a6b6b;
+  --huiqing-deep: #435252;
+
+  /* 古金 */
+  --gujin: #a68a52;
+
+  /* 线条 */
+  --line:        #c4b394;
+  --line-soft:   #d5c7a8;
+  --line-strong: #a08b6a;
+  --line-ink:    #6b5d48;
+
+  /* 字体 */
+  --font-brush: 'STKaiti', 'KaiTi', 'Kaiti SC', 'STZhongsong', 'Songti SC', serif;
+  --font-song:  'STSong', 'SimSun', 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', serif;
+
+  /* 阴影：柔和漫射，像书页自然光下 */
+  --shadow-page: 0 2px 10px rgba(80, 60, 30, 0.10), 0 1px 2px rgba(80, 60, 30, 0.06);
+  --shadow-card: 0 1px 4px rgba(80, 60, 30, 0.08);
 }
 
-html,
-body {
+* { box-sizing: border-box; }
+
+html, body {
   margin: 0;
   padding: 0;
+  min-height: 100vh;
   color: var(--ink);
-  font-family: 'Roboto', 'PingFang SC', 'Segoe UI', Arial, sans-serif;
-  /* 宣纸：双色柔和渐变 + 极淡纹理感 */
-  background:
-    linear-gradient(180deg, #f8f3e7 0%, #f2ebdb 100%);
+  font-family: var(--font-song);
+  font-size: 14.5px;
+  line-height: 1.75;
+  letter-spacing: 0.3px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background-color: var(--paper);
+  background-image:
+    /* 宣纸纤维 - 横向 */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(139, 90, 43, 0.020) 3px,
+      rgba(139, 90, 43, 0.020) 4px
+    ),
+    /* 宣纸纤维 - 纵向 */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(139, 90, 43, 0.014) 4px,
+      rgba(139, 90, 43, 0.014) 5px
+    ),
+    /* 陈旧斑痕 */
+    radial-gradient(ellipse 42% 32% at 12% 22%, rgba(120, 90, 50, 0.10), transparent 70%),
+    radial-gradient(ellipse 32% 26% at 88% 32%, rgba(120, 90, 50, 0.08), transparent 70%),
+    radial-gradient(ellipse 38% 44% at 22% 86%, rgba(120, 90, 50, 0.09), transparent 65%),
+    radial-gradient(ellipse 30% 30% at 78% 78%, rgba(120, 90, 50, 0.07), transparent 65%),
+    /* 边缘做旧 */
+    radial-gradient(circle at 0% 0%,     rgba(100, 75, 40, 0.16), transparent 14%),
+    radial-gradient(circle at 100% 0%,   rgba(100, 75, 40, 0.13), transparent 14%),
+    radial-gradient(circle at 0% 100%,   rgba(100, 75, 40, 0.16), transparent 14%),
+    radial-gradient(circle at 100% 100%, rgba(100, 75, 40, 0.13), transparent 14%),
+    /* 底色 */
+    linear-gradient(180deg, #ece1c4 0%, #e6dab8 60%, #ded1ae 100%);
+  background-attachment: fixed;
 }
 
 #app {
-  box-sizing: border-box;
   min-height: 100vh;
-}
-
-.font-kai {
-  font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
-}
-
-/* ===== 顶部标题栏 ===== */
-.gu-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 22px 16px 16px;
+  flex-direction: column;
   position: relative;
 }
-.gu-title {
-  font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 8px;
+
+::selection {
+  background: rgba(156, 58, 46, 0.18);
   color: var(--ink);
 }
-.gu-subtitle {
-  font-size: 12.5px;
-  color: var(--ink-soft);
-  letter-spacing: 3px;
-  margin-top: 4px;
-  text-align: center;
-}
-.gu-seal {
-  width: 46px;
-  height: 46px;
-  border-radius: 6px;
-  background: var(--zhusha);
-  color: #f7ecd9;
-  font-family: 'KaiTi', 'STKaiti', serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  line-height: 1.1;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(178, 58, 46, 0.35);
-}
 
-/* ===== 卡片 ===== */
+/* ===== 滚动条（暗棕细条，仿旧书边） ===== */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--line-strong); background-clip: padding-box; }
+
+/* ===== 楷体工具类 ===== */
+.font-brush { font-family: var(--font-brush); }
+
+/* ===================================================================
+   Element Plus 定制：木牌 / 印章质感，扁平无高光
+   =================================================================== */
+
+/* ---- 卡片：做成册页纸片 ---- */
 .el-card {
-  background: var(--xuan-card);
+  background: var(--paper-light);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(80, 66, 40, 0.06);
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: box-shadow .3s ease, border-color .3s ease;
 }
+.el-card:hover { box-shadow: var(--shadow-page); }
+
 .el-card__header {
-  font-family: 'KaiTi', 'STKaiti', serif;
-  font-weight: 700;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-size: 16px;
   color: var(--ink);
+  letter-spacing: 4px;
+  position: relative;
+}
+/* 卡片标题左侧朱砂细纹 */
+.el-card__header::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 14px;
+  background: var(--zhusha);
+  opacity: 0.55;
+}
+.el-card__body { padding: 18px 20px; }
+
+/* ---- 按钮：木牌 ---- */
+.el-button {
+  border-radius: 2px;
+  font-family: var(--font-brush);
+  letter-spacing: 3px;
+  font-size: 14px;
+  padding: 9px 18px;
+  height: auto;
+  background: #e0d3b5;
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  box-shadow: none;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+.el-button:hover,
+.el-button:focus {
+  background: #d5c7a8;
+  border-color: var(--zheshi);
+  color: var(--zheshi-deep);
 }
 
-/* ===== 按钮国风定制 ===== */
-.el-button {
-  border-radius: 8px;
-  font-family: 'KaiTi', 'STKaiti', serif;
-  letter-spacing: 2px;
-}
+/* 主按钮：朱砂印章 */
 .el-button--primary {
   background: var(--zhusha);
-  border-color: var(--zhusha);
+  border-color: var(--zhusha-deep);
+  color: #f3e6cc;
 }
 .el-button--primary:hover,
 .el-button--primary:focus {
   background: var(--zhusha-deep);
   border-color: var(--zhusha-deep);
+  color: #f8efdb;
 }
+
+/* 成功按钮：灰青 */
 .el-button--success {
-  background: var(--zhuqing);
-  border-color: var(--zhuqing);
+  background: var(--huiqing);
+  border-color: var(--huiqing-deep);
+  color: #ebeee9;
 }
 .el-button--success:hover,
 .el-button--success:focus {
-  background: #4f6b5a;
-  border-color: #4f6b5a;
+  background: var(--huiqing-deep);
+  border-color: var(--huiqing-deep);
+  color: #f0f2ee;
 }
+
+/* 警告按钮：赭石 */
+.el-button--warning {
+  background: var(--zheshi);
+  border-color: var(--zheshi-deep);
+  color: #f3e6cc;
+}
+.el-button--warning:hover,
+.el-button--warning:focus {
+  background: var(--zheshi-deep);
+  border-color: var(--zheshi-deep);
+}
+
+/* plain 变体：宣纸底 + 有色边框 */
 .el-button.is-plain {
-  background: transparent;
+  background: var(--paper-warm);
 }
 .el-button--primary.is-plain {
   color: var(--zhusha);
   border-color: var(--zhusha);
+  background: var(--paper-warm);
+}
+.el-button--primary.is-plain:hover {
+  background: var(--zhusha-soft);
+  color: var(--zhusha-deep);
 }
 .el-button--success.is-plain {
-  color: var(--zhuqing);
-  border-color: var(--zhuqing);
+  color: var(--huiqing);
+  border-color: var(--huiqing);
+  background: var(--paper-warm);
+}
+.el-button--success.is-plain:hover {
+  background: rgba(90, 107, 107, 0.10);
+  color: var(--huiqing-deep);
 }
 
-/* ===== 标签 ===== */
+.el-button.is-disabled,
+.el-button.is-disabled:hover {
+  background: #e5dcc4;
+  border-color: var(--line-soft);
+  color: var(--ink-faint);
+  opacity: 1;
+}
+
+/* ---- 标签：小木牌 ---- */
 .el-tag {
-  border-radius: 6px;
-  font-family: 'KaiTi', 'STKaiti', serif;
+  border-radius: 2px;
+  font-family: var(--font-brush);
+  letter-spacing: 2px;
+  border-color: var(--line);
+  background: var(--paper-warm);
+  color: var(--ink-soft);
+}
+.el-tag--success {
+  background: rgba(90, 107, 107, 0.12);
+  border-color: rgba(90, 107, 107, 0.4);
+  color: var(--huiqing-deep);
+}
+.el-tag--danger {
+  background: var(--zhusha-soft);
+  border-color: rgba(156, 58, 46, 0.4);
+  color: var(--zhusha-deep);
+}
+.el-tag--warning {
+  background: rgba(139, 90, 43, 0.12);
+  border-color: rgba(139, 90, 43, 0.4);
+  color: var(--zheshi-deep);
+}
+
+/* ---- Radio（候选） ---- */
+.el-radio {
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  background: var(--paper-warm);
+  color: var(--ink);
+  padding: 7px 12px;
+  height: auto;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  transition: background-color .2s, border-color .2s;
+}
+.el-radio:hover {
+  border-color: var(--zheshi);
+  background: #e6d9bb;
+}
+.el-radio.is-checked {
+  border-color: var(--zhusha);
+  background: var(--zhusha-soft);
+  color: var(--zhusha-deep);
+}
+.el-radio__input.is-checked .el-radio__inner {
+  background: var(--zhusha);
+  border-color: var(--zhusha);
+}
+.el-radio__label {
+  font-family: var(--font-song);
+  padding-left: 8px;
+}
+.el-radio__inner {
+  border-color: var(--line-strong);
+  background: var(--paper-light);
+}
+
+/* ---- 输入框 / 选择器 ---- */
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner {
+  background: var(--paper-warm) !important;
+  box-shadow: 0 0 0 1px var(--line) inset !important;
+  border-radius: 2px !important;
+  transition: box-shadow .2s ease;
+}
+.el-input__wrapper:hover,
+.el-select__wrapper:hover {
+  box-shadow: 0 0 0 1px var(--line-strong) inset !important;
+}
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px var(--zheshi) inset !important;
+}
+.el-input__inner,
+.el-textarea__inner {
+  color: var(--ink);
+  font-family: var(--font-song);
+}
+.el-select__placeholder { color: var(--ink-mute); }
+
+/* 下拉面板 */
+.el-popper.is-light {
+  background: var(--paper-light);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow-page);
+}
+.el-select-dropdown__item.is-hovering {
+  background: var(--paper-warm);
+  color: var(--zheshi-deep);
+}
+.el-select-dropdown__item.is-selected {
+  color: var(--zhusha);
+  font-weight: 500;
+}
+
+/* ---- 上传区 ---- */
+.el-upload { width: 100%; }
+
+/* ---- empty ---- */
+.el-empty__description p {
+  color: var(--ink-mute);
+  font-family: var(--font-brush);
+  letter-spacing: 2px;
+}
+
+/* ---- message ---- */
+.el-message {
+  background: var(--paper-light);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow-page);
+  font-family: var(--font-song);
+}
+.el-message--error { border-color: rgba(156, 58, 46, 0.4); }
+.el-message .el-message__content { color: var(--ink); }
+
+/* ===================================================================
+   通用装饰：云纹 / 回纹分隔线
+   =================================================================== */
+.deco-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--line-strong);
+  margin: 14px 0;
+}
+.deco-divider::before,
+.deco-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+}
+.deco-divider .deco-mark {
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--zheshi);
+  font-family: var(--font-brush);
 }
