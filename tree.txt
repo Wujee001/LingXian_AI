@@ -30,7 +30,7 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
 │  ├─models/                               # 模型权重目录（.gitignore，走GitHub Release）
 │  │      .gitkeep                         # 空目录占位
 │  │
-│  ├─modules/                              # ===== 智能句读算法模块 =====
+│  ├─modules/                              # ===== 智能句读算法模块（V2实现） =====
 │  │  │  __init__.py
 │  │  │
 │  │  ├─state_transfer/                    # 数学建模：演奏状态转移
