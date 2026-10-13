@@ -4,16 +4,13 @@
 
   显示整谱图与检测框，支持：点击选中框、拖拽移动框、
   删除框、添加模式下手动画新框。坐标全部归一化(0~1)，
-  随图片缩放自适应。框样式：A已确认竹青实线、U待复核
-  朱砂虚线、未处理古金实线、选中朱砂高亮。
+  随图片缩放自适应。
+  手动画框完成后 emit('box-added', 索引)，由父组件去裁剪、
+  调识别接口、回填数据。
 
-  作者：
-      @Wujee
-
-  创建日期：2026-10-1
-  版本：1.0.0
-
-  许可证：内部使用，未经许可不得传播。
+  作者：@Wujee
+  更新日期：2026-10-13
+  版本：1.2.0（手动画框后通知父组件识别）
 -->
 
 <template>
@@ -41,6 +38,7 @@
            class="box" :class="boxClass(b, i)" :style="boxStyle(b)"
            @mousedown.stop="startDrag($event, i)">
         <span class="idx">{{ i + 1 }}</span>
+        <span v-if="b.recognizing" class="recog">…</span>
       </div>
 
       <div v-if="drawing" class="box drawing" :style="boxStyle(draftBox)"></div>
@@ -49,9 +47,6 @@
 </template>
 
 <script>
-/*
- * 画布交互逻辑；操作埋点见 logger.js，后端日志统一 mlnlog。
- */
 import { logInfo } from '../logger.js'
 
 export default {
@@ -60,7 +55,8 @@ export default {
     imageUrl: { type: String, default: '' },
     boxes: { type: Array, default: () => [] }
   },
-  emits: ['select', 'update:boxes'],
+  // box-added: 手动画框完成，参数为新框索引
+  emits: ['select', 'update:boxes', 'box-added'],
   data() {
     return {
       selected: null,
@@ -97,7 +93,8 @@ export default {
         selected: i === this.selected,
         'st-a': b.status === 'A',
         'st-u': b.status === 'U',
-        'st-n': !b.status
+        'st-n': !b.status,
+        'st-loading': !!b.recognizing
       }
     },
     onDown(e) {
@@ -124,8 +121,22 @@ export default {
     onUp() {
       if (this.drawing) {
         if (this.draftBox.w > 0.02 && this.draftBox.h > 0.02) {
-          this.boxes.push({ ...this.draftBox, status: 'A' })
+          // 先压入一个占位空壳，父组件收到 box-added 后会去识别并回填
+          this.boxes.push({
+            ...this.draftBox,
+            status: 'A',
+            candidates: [],
+            pick: 'unknown',
+            rhythm: 'C',
+            rhythmConf: null,
+            parse_result: null,
+            recognizing: true
+          })
+          const newIdx = this.boxes.length - 1
           logInfo('手动新增框', this.draftBox)
+          this.selected = newIdx
+          this.$emit('select', newIdx)
+          this.$emit('box-added', newIdx)
         }
         this.drawing = false
       }
@@ -160,25 +171,94 @@ export default {
 </script>
 
 <style scoped>
-.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-.legend { font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; }
-.legend i { width: 14px; height: 10px; border-radius: 2px; display: inline-block; margin: 0 4px 0 12px; }
-.lg-a { background: var(--zhuqing); }
-.lg-u { background: var(--zhusha); }
-.lg-n { background: var(--jin); }
+.sheet-wrap { width: 100%; }
 
-.stage { position: relative; width: 100%; user-select: none; }
-.sheet-img { width: 100%; display: block; border-radius: 10px; border: 1px solid var(--line); }
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.legend {
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+}
+.legend i {
+  width: 14px;
+  height: 10px;
+  border-radius: 1px;
+  display: inline-block;
+  margin: 0 5px 0 14px;
+  border: 1px solid;
+}
+.lg-a { background: var(--zhuqing); border-color: var(--zhuqing-deep); }
+.lg-u { background: var(--zhusha); border-color: var(--zhusha-deep); }
+.lg-n { background: var(--jin); border-color: var(--wood); }
 
-.box { position: absolute; box-sizing: border-box; border: 1.6px solid var(--jin); cursor: move; }
+.stage {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  padding: 8px;
+  background-color: rgba(246, 238, 215, 0.55);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(139, 90, 60, 0.02) 0 2px, transparent 2px 6px);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.sheet-img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--line-soft);
+  filter: sepia(0.12) contrast(0.98);
+}
+
+.box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1.6px solid var(--jin);
+  cursor: move;
+  transition: box-shadow 0.15s ease;
+}
 .box .idx {
-  position: absolute; top: -1px; left: -1px;
-  background: rgba(43, 38, 32, 0.7); color: #f5efe1;
-  font-size: 10px; padding: 0 5px; line-height: 15px;
+  position: absolute;
+  top: -1px; left: -1px;
+  background: rgba(28, 23, 18, 0.75);
+  color: #f1e7cf;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 0 5px;
+  line-height: 15px;
+}
+.box .recog {
+  position: absolute;
+  right: -1px; top: -1px;
+  background: var(--jin);
+  color: #f1e7cf;
+  font-size: 10px;
+  padding: 0 5px;
+  line-height: 15px;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 .st-a { border-color: var(--zhuqing); }
 .st-u { border-color: var(--zhusha); border-style: dashed; }
 .st-n { border-color: var(--jin); }
-.selected { border: 2.4px solid var(--zhusha) !important; box-shadow: 0 0 0 2px rgba(178, 58, 46, 0.22); }
-.drawing { border: 1.6px dashed var(--zhusha); background: rgba(178, 58, 46, 0.08); }
+.st-loading { border-color: var(--jin); border-style: dotted; }
+.selected {
+  border: 2.2px solid var(--zhusha) !important;
+  box-shadow: 0 0 0 2px rgba(138, 53, 42, 0.2);
+}
+.drawing {
+  border: 1.6px dashed var(--zhusha);
+  background: rgba(138, 53, 42, 0.08);
+}
 </style>

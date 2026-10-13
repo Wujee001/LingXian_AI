@@ -1,53 +1,54 @@
 <!-- -*- coding: utf-8 -*- -->
 <!--
-  单减字识别页面（泠弦智谱 V1）
+  单减字释读页面（泠弦智谱 V1）
 
-  上传单个减字图片 → 开始识别 → 输出 Top-3 候选与
-  置信度，点选候选查看指法解析（左右手/徽位/释义）。
+  上传单个减字图片 → 开始释读 → 输出 Top-3 候选与
+  置信度，点选候选查看指法释义（左右手/徽位/释义）。
 
   数据来源判断型：优先调用后端 /api/char/predict；
   后端未启动 / 报错 / 未就绪时自动回退内置假数据，
   页面顶部以标签标明「后端识别 / 演示数据」，保证可独立演示。
 
-  作者：
-      @Wujee
-
-  更新日期：2026-10-12
+  作者：@Wujee
+  更新日期：2026-10-13
   版本：1.1.0
-
-  许可证：内部使用，未经许可不得传播。
 -->
 
 <template>
   <div class="single-char">
-    <el-row :gutter="14">
+    <el-row :gutter="16">
       <!-- 上传与预览 -->
       <el-col :xs="24" :sm="10">
-        <el-card shadow="never">
-          <div class="blk">单个减字图片</div>
+        <el-card shadow="never" class="leaf">
+          <div class="blk"><span class="blk-orn">○</span> 上传减字</div>
           <el-upload :auto-upload="false" show-file-list="false"
                      accept=".png,.jpg,.jpeg" :on-change="onPick"
                      class="up">
             <div class="drop">
               <img v-if="imageUrl" :src="imageUrl" class="preview" alt="单字" />
-              <div v-else class="drop-tip">点击选择减字图</div>
+              <div v-else class="drop-tip">
+                <div class="tip-char">琴</div>
+                <div>点击选取减字谱图片</div>
+              </div>
             </div>
           </el-upload>
-          <el-button type="primary" style="width:100%;margin-top:12px"
+          <el-button type="primary" style="width:100%;margin-top:14px"
                      :disabled="!imageUrl" :loading="recognizing" @click="recognize">
-            开始识别
+            开始释读
           </el-button>
         </el-card>
       </el-col>
 
       <!-- 识别结果 -->
       <el-col :xs="24" :sm="14">
-        <el-card shadow="never">
-          <div v-if="!result" class="empty">上传减字并点击「开始识别」<br />查看识别结果与指法解析</div>
+        <el-card shadow="never" class="leaf">
+          <div v-if="!result" class="empty">
+            上传减字图片，点击「开始释读」<br />于此处查看识别候选与指法释义
+          </div>
 
           <template v-else>
             <div class="blk">
-              识别候选（Top-3）
+              <span class="blk-orn">○</span> 识别候选
               <el-tag size="small" :type="fromBackend ? 'success' : 'warning'" class="src-tag">
                 {{ fromBackend ? '后端识别' : '演示数据' }}
               </el-tag>
@@ -59,10 +60,14 @@
               </el-radio>
             </el-radio-group>
 
-            <div class="blk">指法解析</div>
+            <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
             <div class="parse">
-              <div>右手：{{ parse.right_hand.finger }} · {{ parse.right_hand.string }}</div>
-              <div>左手：{{ parse.left_hand.finger }} · {{ parse.left_hand.hui }}</div>
+              <div class="parse-row">
+                <span class="k">右 手</span>{{ parse.right_hand.finger }} · {{ parse.right_hand.string }}
+              </div>
+              <div class="parse-row">
+                <span class="k">左 手</span>{{ parse.left_hand.finger }} · {{ parse.left_hand.hui }}
+              </div>
               <div class="meaning">{{ parse.meaning }}</div>
             </div>
           </template>
@@ -175,20 +180,109 @@ export default {
 </script>
 
 <style scoped>
-.blk { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); margin: 6px 0 10px; }
-.src-tag { margin-left: 8px; }
+.single-char { padding: 4px 0; }
+
+/* 卡片：仿书页 */
+.leaf :deep(.el-card__body) { padding: 18px 20px; }
+
+.blk {
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.18em;
+  margin: 4px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--line-soft);
+}
+.blk-orn {
+  color: var(--zheshi);
+  font-size: 9px;
+  margin-right: 6px;
+  vertical-align: 2px;
+}
+.src-tag { margin-left: 10px; letter-spacing: 0.05em; }
+
+/* 上传区 */
 .up { width: 100%; }
 .drop {
-  width: 100%; min-height: 220px;
-  border: 1.5px dashed var(--line); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(184,134,11,0.05); overflow: hidden;
+  width: 100%;
+  min-height: 236px;
+  border: 1px dashed var(--line-deep);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(246, 238, 215, 0.4);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(139, 90, 60, 0.02) 0 2px, transparent 2px 6px);
+  overflow: hidden;
+  transition: background-color 0.25s ease;
 }
-.drop-tip { color: var(--ink-soft); font-size: 13px; }
+.drop:hover { background-color: rgba(240, 229, 200, 0.55); }
+.drop-tip {
+  color: var(--ink-faint);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: 0.15em;
+}
+.tip-char {
+  font-family: 'STXingkai', '华文行楷', 'STKaiti', 'KaiTi', serif;
+  font-size: 52px;
+  color: var(--line-deep);
+  opacity: 0.55;
+  line-height: 1;
+  margin-bottom: 10px;
+}
 .preview { max-width: 100%; max-height: 300px; }
-.empty { color: var(--ink-soft); font-size: 13px; text-align: center; line-height: 2; padding: 60px 0; }
-.cand { display: flex; margin: 0 8px 8px 0; }
-.conf { color: var(--ink-soft); font-size: 11px; }
-.parse { font-size: 12.5px; line-height: 1.9; background: rgba(184,134,11,0.07); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
-.parse .meaning { color: var(--zhusha); margin-top: 4px; }
+
+.empty {
+  color: var(--ink-faint);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 13px;
+  text-align: center;
+  line-height: 2.2;
+  padding: 70px 0;
+  letter-spacing: 0.12em;
+}
+
+.cand {
+  display: flex;
+  margin: 0 8px 10px 0;
+  font-family: 'SimSun', 'Songti SC', serif;
+}
+.conf {
+  color: var(--ink-faint);
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.parse {
+  font-family: 'SimSun', 'Songti SC', serif;
+  font-size: 13px;
+  line-height: 2;
+  background-color: rgba(246, 238, 215, 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--zheshi);
+  border-radius: 2px;
+  padding: 12px 14px;
+}
+.parse-row { color: var(--ink); }
+.parse-row .k {
+  display: inline-block;
+  width: 56px;
+  color: var(--ink-faint);
+  font-family: 'STKaiti', 'KaiTi', serif;
+  letter-spacing: 0.3em;
+}
+.parse .meaning {
+  color: var(--zhusha-deep);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line-soft);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  letter-spacing: 0.06em;
+}
 </style>
