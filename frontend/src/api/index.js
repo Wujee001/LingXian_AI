@@ -59,17 +59,21 @@ request.interceptors.response.use(
 )
 
 /* ---------------- 单减字 ---------------- */
-export function predictSingle(file) {
+export function predictSingle(file, engine = 'auto') {
   const fd = new FormData()
   fd.append('file', file)
-  return request.post('/api/char/predict', fd)
+  fd.append('engine', engine)            // auto 自动 / yolo 本地模型 / qwen 多模态
+  // 多模态兜底单图可能耗时，放宽到 60s
+  return request.post('/api/char/predict', fd, { timeout: 60000 })
 }
 
 /* ---------------- 整谱打谱 ---------------- */
-export function uploadSheet(file) {
+export function uploadSheet(file, engine = 'auto') {
   const fd = new FormData()
   fd.append('file', file)
-  return request.post('/api/sheet/upload', fd)
+  fd.append('engine', engine)            // auto 自动 / yolo 本地模型 / qwen 多模态
+  // qwen 模式整谱逐框走多模态，放宽到 300s
+  return request.post('/api/sheet/upload', fd, { timeout: 300000 })
 }
 
 export function correctSheet(payload) {

@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-整谱减字检测模块
+整谱减字检测模块（OpenCV 规则兜底）
 
-V1 使用 OpenCV 规则兜底：灰度→二值化→形态学→连通域，
-框出整页减字谱中单个减字方块的大致位置，按古琴竖排
-从右往左、从上到下排序。
-V2 模型线 YOLO/RF-DETR 权重交付后，仅替换 detect() 内部，
-上层接口与前端不动。
+职责：灰度→二值化→形态学→连通域，框出整页减字谱中单个
+减字方块的大致位置，按古琴竖排从右往左、列内从上到下排序。
+
+三级降级中的位置：
+    YOLO 权重（service/yolo_infer.py，检测+分类一体）为主路线；
+    当 YOLO 不可用时，由本模块先用规则给出「位置准确的框」，
+    再逐框交给多模态/分类器识别类别；本模块只产框、不产类别。
+读图统一用 imdecode，兼容中文路径与 PNG/JPG/JPEG。
 
 作者：
     @Wujee
 
-创建日期：2026-10-1
-版本：1.0.0
+更新日期：2026-10-13
+版本：1.1.0
 
 许可证：内部使用，未经许可不得传播。
 
@@ -33,7 +36,9 @@ def detect(image_path: str) -> list:
     返回：
         list[dict]，每项 {x, y, w, h}，均为 0~1 归一化坐标
     """
-    img = cv2.imread(image_path)
+    # imdecode 读图，兼容中文/非 ASCII 路径（cv2.imread 对中文名会返回 None）
+    data = np.fromfile(image_path, dtype=np.uint8)
+    img = cv2.imdecode(data, cv2.IMREAD_COLOR)
     if img is None:
         MLN_LOG_WARN("整谱图读取失败：%s", image_path)
         return []

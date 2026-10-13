@@ -9,7 +9,7 @@
   后端未启动 / 报错 / 未就绪时自动回退内置假数据，
   页面顶部以标签标明「后端识别 / 演示数据」，保证可独立演示。
 
-  作者：@Wujee
+  作者：@zlx @Wujee
   更新日期：2026-10-13
   版本：1.1.0
 -->
@@ -36,6 +36,14 @@
                      :disabled="!imageUrl" :loading="recognizing" @click="recognize">
             开始释读
           </el-button>
+          <div class="engine-bar">
+            <span class="engine-lbl">识别引擎</span>
+            <el-radio-group v-model="engine" size="small">
+              <el-radio-button label="auto">自动</el-radio-button>
+              <el-radio-button label="yolo">本地模型</el-radio-button>
+              <el-radio-button label="qwen">多模态</el-radio-button>
+            </el-radio-group>
+          </div>
         </el-card>
       </el-col>
 
@@ -50,8 +58,12 @@
             <div class="blk">
               <span class="blk-orn">○</span> 识别候选
               <el-tag size="small" :type="fromBackend ? 'success' : 'warning'" class="src-tag">
-                {{ fromBackend ? '后端识别' : '演示数据' }}
+                {{ sourceLabel }}
               </el-tag>
+              <el-button size="small" plain class="retry-btn" :loading="recognizing"
+                         @click="recognize('qwen')">
+                多模态重认
+              </el-button>
             </div>
             <el-radio-group v-model="pick" @change="reparse">
               <el-radio v-for="c in result" :key="c[0]" :label="c[0]"
@@ -100,23 +112,33 @@ export default {
       pick: '',
       parse: null,
       fromBackend: false,
+      source: '',
+      engine: 'auto',
       recognizing: false
     }
   },
   methods: {
+    sourceLabel() {
+      if (!this.fromBackend) return '演示数据'
+      if (this.source === 'yolo') return '本地模型识别'
+      if (this.source === 'qwen') return '多模态识别'
+      return '后端识别'
+    },
     onPick(file) {
       this.rawFile = file.raw
       this.imageUrl = URL.createObjectURL(file.raw)
       this.result = null
       this.fromBackend = false
+      this.source = ''
       logInfo('选择单减字图', file.name)
     },
-    async recognize() {
+    async recognize(forceEngine) {
       if (!this.rawFile) return
+      const engine = forceEngine || this.engine
       this.recognizing = true
       try {
-        // 优先调用后端真实接口
-        const res = await predictSingle(this.rawFile)
+        // 优先调用后端真实接口（可手动指定引擎）
+        const res = await predictSingle(this.rawFile, engine)
         const body = res && res.data
         if (!body || !body.success || !body.data || !Array.isArray(body.data.candidates)) {
           throw new Error('后端返回结构异常')
@@ -125,6 +147,7 @@ export default {
         this.pick = body.data.top_key || this.result[0][0]
         this.parse = this.fmtParse(body.data.parse_result, this.pick)
         this.fromBackend = true
+        this.source = body.data.source || 'yolo'
         logInfo('单减字识别完成（后端）', this.pick)
       } catch (e) {
         // 后端不可用：回退内置假数据
@@ -138,6 +161,7 @@ export default {
         this.pick = this.result[0][0]
         this.parse = this.fakeParse(this.pick)
         this.fromBackend = false
+        this.source = 'fake'
         logInfo('单减字识别完成（演示）', this.pick)
       } finally {
         this.recognizing = false
@@ -202,6 +226,21 @@ export default {
   vertical-align: 2px;
 }
 .src-tag { margin-left: 10px; letter-spacing: 0.05em; }
+.retry-btn { float: right; letter-spacing: 0.05em; }
+
+.engine-bar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+.engine-lbl {
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.15em;
+}
 
 /* 上传区 */
 .up { width: 100%; }

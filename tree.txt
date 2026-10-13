@@ -2,35 +2,36 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
 │
 │  .gitignore                              # Git忽略规则（权重/数据集/node_modules/db/logs）
 │  README.md                               # 项目说明 + 启动步骤
-│  requirements.txt                        # Python后端依赖清单
+│  requirements.txt                        # Python后端依赖清单（fastapi/uvicorn/opencv/ultralytics）
 │  tree.txt                                # 项目目录树（本文件）
 │
 ├─backend/                                 # ===== FastAPI 后端 =====
-│  │  main.py                              # FastAPI入口（挂载路由 + CORS）
+│  │  main.py                              # FastAPI入口（挂载路由 + /static静态目录 + CORS + 日志初始化）
 │  │  __init__.py                          # 后端包标识
 │  │
 │  ├─api/                                  # 接口路由层
-│  │      knowledge.py                     # 知识库查询/浏览接口
-│  │      single_char.py                   # 单减字识别+解析接口（V1核心）
-│  │      whole_sheet.py                   # 整谱打谱接口（减字检测+批量识别）
-│  │      judou.py                         # 智能句读接口 /api/judou/segment（输入减字序列→逐字边界标签+置信度）
+│  │      knowledge.py                     # 知识库 查询/浏览/搜索/注册表 接口
+│  │      single_char.py                   # 单减字识别 /api/char/predict（engine=auto/yolo/qwen，三级降级）
+│  │      whole_sheet.py                   # 整谱打谱 /api/sheet/upload（engine切换，YOLO出框+逐框认字）+ /correct 人工修正
+│  │      judou.py                         # 智能句读 /api/judou/segment（多模态优先→规则兜底）
 │  │      __init__.py                      # 路由包标识
 │  │
 │  ├─core/                                 # 配置与静态资源
-│  │      config.py                        # 全局配置（全部相对路径，禁写死盘符）
-│  │      jianzipu_lib.json                # 减字语义知识库（减字→左右手/徽位/释义）
+│  │      config.py                        # 全局配置（全部相对路径，禁写死盘符；启动自动建目录）
+│  │      jianzipu_lib.json                # 减字语义知识库（减字→左右手/徽位/释义），25 类
 │  │      __init__.py                      # core包标识
 │  │
 │  ├─data/                                 # 后端数据
-│  │      class_registry.csv               # 类别主表（拼音key+中文显示，软件/模型共用）
+│  │      class_registry.csv               # 类别主表（class_id/class_key/display_name/category/active，25 类）
+│  │      corrections.json                 # 人工修正回流库（运行期自动生成，追加带时间戳）
 │  │
 │  ├─logs/                                 # 运行日志输出目录（.gitignore）
-│  │      mlnlog.txt                       # 日志记录
+│  │      mlnlog.log                       # 后端统一日志（mlnlog：控制台彩色+文件持久化）
 │  │
-│  ├─models/                               # 模型权重目录（.gitignore，走GitHub Release）
-│  │      .gitkeep                         # 空目录占位
+│  ├─models/                               # 模型权重目录（.gitignore，大文件走GitHub Release）
+│  │      best.pt                          # 队友训练的 YOLO 权重（279类细标签，检测可用、分类待补样本，约5.6MB）
 │  │
-│  ├─modules/                              # ===== 智能句读算法模块（V2实现） =====
+│  ├─modules/                              # ===== 智能句读算法模块（V2实现，V1 暂为空壳） =====
 │  │  │  __init__.py
 │  │  │
 │  │  ├─state_transfer/                    # 数学建模：演奏状态转移
@@ -49,15 +50,18 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
 │  │         decision.py                   # 决策引擎（maxP<τ → U 人工复核，概率约束校验）
 │  │         __init__.py
 │  │
-│  ├─service/                              # 业务逻辑层
-│  │      classifier.py                    # 单减字图像分类器（假模型→真模型唯一替换点 predict()）
-│  │      detector.py                      # 整谱减字检测器（定位检测，输出框坐标）
+│  ├─service/                              # 业务逻辑层（识别三级降级核心）
+│  │      yolo_infer.py                    # 【一级】本地 YOLO 推理（best.pt 实为279类细标签；负责出框+竖排排序，仅保留能对上25类的key，另存raw_label）
+│  │      qwen_adapter.py                  # 【二级】阿里云多模态 qwen3-omni-flash（urllib直连，零依赖，额度熔断，key归一化，实测1~2s）
+│  │      classifier.py                    # 单减字分类统一入口 predict_crop(pil, engine=auto/yolo/qwen) + get_last_source
+│  │      detector.py                      # 【降级】OpenCV 规则检测出框（np.fromfile+imdecode，兼容中文路径）
+│  │      correction_store.py              # 人工修正落库 corrections.json（线程锁、追加、时间戳）
 │  │      parser.py                        # 减字解析（识别结果→查知识库→演奏状态 z_i）
-│  │      registry.py                      # 类别注册表加载（读取 class_registry.csv）
+│  │      registry.py                      # 类别注册表加载（读 class_registry.csv，带缓存）
 │  │      __init__.py                      # service包标识
 │  │
 │  ├─static/                               # 静态资源目录（上传图片访问、静态文件托管）
-│  │  └─upload/                            # 上传图片静态访问目录
+│  │  └─upload/                            # 上传图片静态访问目录（/static/upload/<uuid>.<ext>）
 │  │
 │  ├─temp_upload/                          # 用户上传图片临时目录（.gitignore）
 │  │      .gitkeep                         # 空目录占位
@@ -74,35 +78,38 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
 │      ARCHITECTURE.md                     # 项目整体架构设计文档
 │      团队分工.md                          # 协作分工 + Git分支规范
 │      接口契约.md                          # 软件↔模型接缝契约（交付物清单）
-│      句读规则手册.md                      #句读原则→可计算字段映射表（上下文/结构完整/标志结构/层级/歧义）
+│      句读规则手册.md                      # 句读原则→可计算字段映射表（上下文/结构完整/标志结构/层级/歧义）
+│      迭代规划.md                          # V1/V2 迭代规划
 │
 ├─frontend/                                # ===== Vue3 + Element-Plus 前端 =====
 │  │  index.html                           # HTML入口
 │  │  package.json                         # 前端依赖配置
-│  │  package-lock.json                    # npm依赖版本锁定文件
-│  │  vite.config.js                       # Vite配置（/api 代理到后端8001端口）
+│  │  package-lock.json                   # npm依赖版本锁定文件
+│  │  vite.config.js                       # Vite配置（/api 与 /static 代理到后端8001端口）
 │  │
 │  └─src/                                  # 前端源码
-│      │  App.vue                          # 根组件（国风导航布局+双功能页签）
+│      │  App.vue                          # 根组件（国风导航布局+四功能页签）
 │      │  main.js                          # 前端入口（挂载ElementPlus + 路由）
 │      │  style.css                        # 全局国风样式（宣纸+墨色+朱砂）
 │      │  logger.js                        # 前端操作埋点（后端统一由mlnlog持久化）
 │      │
 │      ├─api/                              # API请求封装
-│      │      index.js                     # axios统一封装（识别/知识库/整谱/句读接口）
+│      │      index.js                     # axios统一封装（识别/知识库/整谱/句读/修正接口，分级超时）
 │      │
 │      ├─components/                       # 公共组件
 │      │      SheetCanvas.vue              # 谱图画布组件（框选、拖拽、新增删除、交互）
 │      │
 │      ├─router/                           # 路由配置
-│      │      index.js                     # 路由表（单减字/整谱打谱/智能句读）
+│      │      index.js                     # 路由表（单减字/整谱打谱/智能句读/知识库）
 │      │
 │      └─views/                            # 页面
-│              SingleChar.vue              # 【单减字解析】V1核心演示页面
-│              WholeSheet.vue              # 【整谱打谱】减字识别+指法解析+节奏划分
-│              JudouSegment.vue            # 【智能句读】逐字边界标注页（C/S/L/E/U 可视化+人工复核）
+│              SingleChar.vue              # 【单减字识别】上传单字→Top3候选+释义（引擎切换 自动/本地/多模态 + 多模态重认）
+│              WholeSheet.vue              # 【整谱打谱】检测+识别+指法+句读+人工修正+导出（引擎切换，单框多模态重认）
+│              Judou.vue                   # 【智能句读】独立页：逐字 C/S/L/E/U 标注+人工复核
+│              Knowledge.vue               # 【知识库】减字库浏览/检索/详情
+│              JudouSegment.vue            # 废弃空壳（无路由引用，保留）
 │
-├─scripts/                                 # ===== 训练脚本 =====
+├─scripts/                                 # ===== 训练脚本（训练在Colab GPU，推理在本地CPU） =====
 │      train_colab.ipynb                   # Colab/AI Studio 迁移学习脚本（ResNet18 单字分类）
 │      train_sequence.ipynb                # 句读序列模型训练脚本（Baseline/Transformer 消融对照）
 │
@@ -111,6 +118,23 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
 ============================================================
   关键说明
 ============================================================
+【五大功能与识别三级降级】
+  功能：①单减字识别 ②整谱打谱 ③人工修正 ④知识库 ⑤智能句读
+  识别降级（任一级失败自动落到下一级，前端标签显示来源 yolo/qwen/fake）：
+    一级 YOLO 本地权重 best.pt（service/yolo_infer.py，CPU 推理，需 pip install ultralytics）
+    二级 阿里云多模态 qwen3-omni-flash（service/qwen_adapter.py，读环境变量
+         DASHSCOPE_API_KEY，免费额度用完即停；HTTP403/401/429 自动熔断；urllib 零依赖；
+         图片发送前压缩至长边960/JPEG；qwen3.8-omni-flash 偏慢仅留备选，qwen-mt-uni 为翻译模型不可用）
+    三级 内置假数据（固定候选/规则句读），保证无网络、无权重时仍可演示
+  识别引擎手动切换（前端单字页/整谱页可选，表单字段 engine）：
+    auto 自动：YOLO 出框，能对上25类基础key的框用本地，其余框自动补多模态认字
+    yolo 本地模型：仅本地、不联网不耗额度；对不上的细类框置空并标 U（显示模型初判）
+    qwen 多模态：YOLO 负责出框、逐框裁剪交多模态认字（当前最准，耗额度，整谱较慢）
+    注：best.pt 实测为 279 类细粒度中文标签（含弦/徽/指法，非25类基础key），
+        检测框可用（XWC.png 出38框），但分类因训练样本不足、当前对不上基础key，
+        故 V1 以「YOLO出框 + 多模态认字」为准；单框也可点「多模态重认」。
+  整谱：各引擎均优先 YOLO 出框；YOLO 不可用则 OpenCV 规则出框（detector）后逐框分类
+  人工修正：/api/sheet/correct → correction_store.py 落库 data/corrections.json
 【C/S/L/E/U 边界标签】（标记两个相邻减字之间的停顿）
   C Continue  连续   —— 不建议停顿，演奏连贯
   S Short     短停   —— 弱边界，非句末小停顿
@@ -125,25 +149,33 @@ LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根�
         汉语言句读 → judou/rules+features → 句读启发特征 q_i
   第三层 序列推断层：fusion 拼接 [z_i, Δz_i, q_i] → sequence/transformer_model → P(C/S/L/E)
                     → decision 按阈值与约束输出标签，低置信/歧义 → U
+  注：V1 句读直接用多模态 qwen3-omni-flash 输出 C/S/L/E；modules/ 内算法为 V2 预留空壳
 【双模型对照（消融实验，写论文用）】
   Baseline：baseline_model.py 仅用 Δz_i，可解释、易复现
   序列模型：transformer_model.py 用 [z_i, Δz_i, q_i] 学习上下文
   两者对比：证明领域特征与序列建模各自贡献，无论谁高都可成结论
 【模型可插拔原则】
-  classifier.predict()、baseline_model、transformer_model 均为独立替换点
-  上层接口、decision、前端不动，仅替换内部实现即可切换模型
+  yolo_infer / classifier.predict_crop / qwen_adapter / baseline_model / transformer_model
+  均为独立替换点，上层接口、decision、前端不动，仅替换内部实现即可切换模型
 【视觉与乐理分离原则】
   视觉模型只认字形（输出拼音 class_key）
   乐理全部交给 jianzipu_lib.json（左手弦/徽 + 右手指法 + 释义）
   class_registry.csv 为软件与模型共用的唯一类别主表
+【上传约定】
+  支持 .png / .jpg / .jpeg；后端扩展名白名单 + UUID 重命名 + PIL 校验，防中文路径问题
 【端口约定】
   后端 FastAPI：http://127.0.0.1:8001
   前端 Vite：   http://127.0.0.1:5173
   API文档：     http://127.0.0.1:8001/docs
 【启动命令】
-  后端：conda activate lingxian
+  后端（首次需先装 YOLO 依赖）：
+        conda activate lingxian
+        pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+        pip install ultralytics          # 不装也能跑，会自动降级到多模态/假数据
         cd backend
-        uvicorn main:app --reload --host 127.0.0.1 --port 8001
+        python main.py
   前端：cd frontend
         npm install
         npm run dev
+  多模态密钥（PowerShell 当前用户永久生效）：
+        [Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY","你的key","User")

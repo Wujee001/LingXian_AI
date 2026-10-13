@@ -7,7 +7,7 @@
        手动画框时自动裁剪该区域调 /api/char/predict 识别 →
        确认或标记复核时回传 /api/sheet/correct。
 
-  作者：@Wujee
+  作者：@zlx @Wujee
   更新日期：2026-10-13
   版本：1.3.0（手动画框后自动识别）
 -->
@@ -23,6 +23,11 @@
         <el-button type="success" plain :disabled="!imageUrl" :loading="detecting" @click="genBoxes">
           一键画框
         </el-button>
+        <el-radio-group v-model="engine" size="small" :disabled="detecting">
+          <el-radio-button label="auto">自动</el-radio-button>
+          <el-radio-button label="yolo">本地模型</el-radio-button>
+          <el-radio-button label="qwen">多模态</el-radio-button>
+        </el-radio-group>
         <el-button plain :disabled="!items.length || judouLoading" :loading="judouLoading"
                    @click="fetchJudou">智能句读</el-button>
         <el-button plain :disabled="!items.length" @click="clearAll">清 除</el-button>
@@ -30,7 +35,7 @@
           导出打谱结果
         </el-button>
         <el-tag v-if="items.length" size="small" :type="fromBackend ? 'success' : 'warning'">
-          {{ fromBackend ? '后端识别' : '演示数据' }}
+          {{ sourceLabel }}
         </el-tag>
         <span class="fname" v-if="fileName">{{ fileName }}</span>
       </div>
@@ -69,10 +74,20 @@
 
           <!-- 无候选 -->
           <div v-else class="hint-hint">
-            未识别到候选，可调整框后点击「重新识别」
-            <el-button size="small" plain class="retry-btn" @click="retryRecognize">
-              重新识别
-            </el-button>
+            <div v-if="cur.raw_label" class="raw-lbl">
+              本地模型初判：{{ cur.raw_label }}
+            </div>
+            本地模型未给出可靠类别，可改用多模态认字
+            <div class="retry-row">
+              <el-button size="small" type="primary" plain class="retry-btn"
+                         :loading="cur.recognizing" @click="retryRecognize('qwen')">
+                多模态重认
+              </el-button>
+              <el-button size="small" plain class="retry-btn"
+                         :loading="cur.recognizing" @click="retryRecognize()">
+                重新识别
+              </el-button>
+            </div>
           </div>
 
           <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
@@ -105,6 +120,8 @@
           <div class="actions">
             <el-button type="success" size="small" @click="confirmItem">确 认</el-button>
             <el-button type="warning" size="small" @click="markReview">标 记 复 核</el-button>
+            <el-button size="small" plain :loading="cur.recognizing"
+                       @click="retryRecognize('qwen')">多模态重认</el-button>
           </div>
         </template>
       </el-card>
@@ -150,6 +167,9 @@ export default {
       items: [],
       selectedIdx: null,
       fromBackend: false,
+      source: '',          // yolo / qwen / fake
+      engine: 'auto',      // auto / yolo / qwen（用户手动切换）
+      backendImageUrl: '', // 后端保存的谱图地址（随人工修正回传）
       detecting: false,
       judouLoading: false
     }
@@ -157,6 +177,12 @@ export default {
   computed: {
     cur() {
       return this.selectedIdx === null ? null : this.items[this.selectedIdx]
+    },
+    sourceLabel() {
+      if (!this.fromBackend) return '演示数据'
+      if (this.source === 'yolo') return '本地模型识别'
+      if (this.source === 'qwen') return '多模态识别'
+      return '后端识别'
     }
   },
   methods: {
@@ -167,6 +193,8 @@ export default {
       this.items = []
       this.selectedIdx = null
       this.fromBackend = false
+      this.source = ''
+      this.backendImageUrl = ''
       logInfo('上传减字谱', file.name)
     },
 
@@ -175,7 +203,7 @@ export default {
       if (!this.rawFile) return
       this.detecting = true
       try {
-        const res = await uploadSheet(this.rawFile)
+        const res = await uploadSheet(this.rawFile, this.engine)
         const body = res && res.data
         if (!body || !body.success || !body.data || !Array.isArray(body.data.items)) {
           throw new Error('后端返回结构异常')
@@ -188,19 +216,23 @@ export default {
           status: it.status || 'A',
           candidates: (it.candidates || []).map(c => [c[0], c[1]]),
           pick: (it.candidates && it.candidates[0] && it.candidates[0][0]) || 'unknown',
+          raw_label: it.raw_label || '',
           rhythm: 'C',
           rhythmConf: null,
           parse_result: this.fmtParse(it.parse_result),
           recognizing: false
         }))
         this.fromBackend = true
-        logInfo('整谱检测完成（后端）', `共 ${this.items.length} 框`)
+        this.source = body.data.source || 'yolo'
+        this.backendImageUrl = body.data.image_url || ''
+        logInfo('整谱检测完成（后端）', `共 ${this.items.length} 框，来源=${this.source}`)
         if (!this.items.length) ElMessage.info('后端未检测到减字框，可换用背景干净的谱图或手动画框')
       } catch (e) {
         logWarn('后端整谱检测不可用，回退模拟框', e && e.message)
         ElMessage.warning('后端未连接或检测异常，当前使用演示框')
         this.items = this.buildFakeBoxes()
         this.fromBackend = false
+        this.source = 'fake'
         logInfo('一键画框完成（演示）', `共 ${this.items.length} 框`)
       } finally {
         this.detecting = false
@@ -208,15 +240,16 @@ export default {
       if (this.items.length) await this.fetchJudou()
     },
 
-    // 手动画框后：裁剪 → 单字识别 → 回填
-    async onBoxAdded(idx) {
+    // 手动画框后：裁剪 → 单字识别（可强制引擎）→ 回填
+    async onBoxAdded(idx, forceEngine) {
       const it = this.items[idx]
       if (!it) return
+      const engine = forceEngine || 'auto'
       it.recognizing = true
-      logInfo('手动画框，开始识别', `index=${idx}`)
+      logInfo('手动画框，开始识别', `index=${idx} engine=${engine}`)
       try {
         const file = await this.cropByBox(this.imageUrl, it)
-        const res = await predictSingle(file)
+        const res = await predictSingle(file, engine)
         const body = res && res.data
         if (!body || !body.success || !body.data || !Array.isArray(body.data.candidates)) {
           throw new Error('识别返回异常')
@@ -240,10 +273,10 @@ export default {
       }
     },
 
-    // 手动点"重新识别"
-    async retryRecognize() {
+    // 手动点"重新识别"（forceEngine 可传 qwen 强制多模态）
+    async retryRecognize(forceEngine) {
       if (this.selectedIdx === null) return
-      await this.onBoxAdded(this.selectedIdx)
+      await this.onBoxAdded(this.selectedIdx, forceEngine)
     },
 
     // 用 canvas 从原图裁剪出归一化 box 对应的区域，返回 File
@@ -397,9 +430,12 @@ export default {
     async _reportCorrect(confirmedKey) {
       try {
         await correctSheet({
+          image_url: this.backendImageUrl,
           index: this.selectedIdx,
           box: { x: this.cur.x, y: this.cur.y, w: this.cur.w, h: this.cur.h },
-          confirmed_key: confirmedKey
+          origin_key: (this.cur.candidates && this.cur.candidates[0] && this.cur.candidates[0][0]) || null,
+          confirmed_key: confirmedKey,
+          source: this.fromBackend ? this.source : 'fake'
         })
         logInfo('修正回流成功', `index=${this.selectedIdx} key=${confirmedKey}`)
       } catch (e) {
@@ -417,7 +453,7 @@ export default {
         const rh = it.rhythm && it.rhythm !== 'C' ? `  [${it.rhythm}]` : ''
         return `${String(i + 1).padStart(2, '0')}. ${it.pick}${rh}`
       })
-      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：${this.fromBackend ? '后端识别' : '演示数据'}\n\n${lines.join('\n')}\n`
+      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：${this.sourceLabel}\n\n${lines.join('\n')}\n`
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
@@ -503,6 +539,13 @@ export default {
   padding: 6px 0;
 }
 .retry-btn { margin-left: 8px; }
+.retry-row { margin-top: 8px; }
+.raw-lbl {
+  color: var(--zhusha-deep);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
 
 .cand { display: flex; margin: 0 8px 10px 0; font-family: 'SimSun', 'Songti SC', serif; }
 .conf { color: var(--ink-faint); font-size: 11px; margin-left: 4px; }
