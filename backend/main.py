@@ -16,10 +16,21 @@ V1 先启用整谱打谱路由，其余路由随模块就绪放开注释。
 """
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
+
+from utils.mlnlog import MlnLog, LogLevel
+
+_BACKEND_DIR = Path(__file__).resolve().parent
+_LOG_DIR = _BACKEND_DIR / "logs"
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+MlnLog.initialize(LogLevel.INFO, console=True)
+MlnLog.get_instance().set_log_file(str(_LOG_DIR / "lingxian.log"))
 
 from api import whole_sheet, single_char, knowledge, judou
 
