@@ -122,4 +122,3 @@ def _sort_guqin_order(boxes: list) -> list:
         col["items"].sort(key=lambda b: b["y"])
         result.extend(col["items"])
     return result
-#（注：内容由AI生成）

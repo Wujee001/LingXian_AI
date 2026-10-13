@@ -2,8 +2,10 @@
  *
  * 路由配置模块
  *
- * 采用 Hash 路由，注册整谱打谱、数据集标注、项目设置
- * 三个页面，根路径重定向到整谱打谱。
+ * 采用 Hash 路由，注册单减字识别、整谱打谱两个功能页，
+ * 根路径重定向到单减字识别。
+ * （main.js 当前以 el-tabs 切换页面、未启用本路由；
+ *   保留配置供后续多视图扩展。）
  *
  * 作者：
  *     @Wujee
@@ -16,29 +18,23 @@
  */
 
 import { createRouter, createWebHashHistory } from 'vue-router'
+import SingleChar from '../views/SingleChar.vue'
 import WholeSheet from '../views/WholeSheet.vue'
-import DatasetLabel from '../views/DatasetLabel.vue'
-import Setting from '../views/Setting.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/wholesheet'
+    redirect: '/single'
   },
   {
-    path: '/wholesheet',
+    path: '/single',
+    name: '单减字识别',
+    component: SingleChar
+  },
+  {
+    path: '/sheet',
     name: '整谱打谱',
     component: WholeSheet
-  },
-  {
-    path: '/dataset',
-    name: '数据集标注',
-    component: DatasetLabel
-  },
-  {
-    path: '/setting',
-    name: '项目设置',
-    component: Setting
   }
 ]
 

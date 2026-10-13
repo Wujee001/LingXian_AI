@@ -1,0 +1,28 @@
+# ============================================================
+# 泠弦智谱 LingXianAI 后端依赖（Python 3.10）
+# 安装：pip install -r requirements.txt
+# 作者：@Wujee  版本：1.0.0  许可证：内部使用，未经许可不得传播
+# ============================================================
+
+# ---- Web 框架与服务 ----
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9        # FastAPI UploadFile 文件上传必需
+
+# ---- 图像处理 / 规则检测 ----
+pillow>=10.0
+opencv-python>=4.8
+numpy>=1.24
+
+# ============================================================
+# 真实模型推理依赖（权重交付后才需要，假模型阶段可不装）
+# 体积较大，建议单独安装 CPU 版，不要直接 pip install torch：
+#
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#
+# 装妥后把 resnet18_qin.pth 与 class_mapping.json 放入
+# backend/models/，classifier.py 会自动加载，无需改代码。
+# （下方两行保留，联网执行 pip install -r 时会装默认 GPU/CPU 版）
+# ============================================================
+# torch>=2.1
+# torchvision>=0.16

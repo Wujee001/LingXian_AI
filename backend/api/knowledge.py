@@ -6,38 +6,37 @@
 - 列表浏览（可按散音/按音/泛音/装饰音/复合音筛选）
 - 单个减字完整解析
 - 模糊搜索（指法/弦/徽位/释义/拼音key）
-- 类别主表导出
+- 类别主表导出（统一由 service.registry 加载，避免重复解析 CSV）
 
-数据来源：core/jianzipu_lib.json（语义库）、data/class_registry.csv（类别主表）。
+数据来源：core/jianzipu_lib.json（语义库）、service.registry（类别主表）。
 视觉模型只输出拼音 key，乐理解析全部由此模块对外提供。
 
 作者：
     @Wujee
 
 创建日期：2026-10-08
-版本：1.0.0
+版本：1.0.1（整合 registry，移除重复 CSV 加载）
 
 许可证：内部使用，未经许可不得传播。
 
 """
 
-import csv
 import json
 from pathlib import Path
+
 from fastapi import APIRouter, HTTPException, Query
-from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_WARN, MLN_LOG_ERROR
+
+from service.registry import all_classes
+from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_WARN
 
 router = APIRouter()
 
 # 基于本文件位置定位数据文件，禁写死盘符
 _CORE_DIR = Path(__file__).resolve().parent.parent / "core"
-_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _LIB_PATH = _CORE_DIR / "jianzipu_lib.json"
-_REGISTRY_PATH = _DATA_DIR / "class_registry.csv"
 
-# 启动时加载到内存
+# 启动时加载语义库到内存（类别主表统一由 service.registry 缓存）
 _lib: dict = {}
-_registry: list[dict] = []
 
 
 def _load_lib():
@@ -47,24 +46,11 @@ def _load_lib():
             _lib = json.load(f)
         MLN_LOG_INFO("知识库加载完成，共 %d 个减字", len(_lib))
     except Exception as e:
-        MLN_LOG_ERROR("知识库加载失败: %s", e)
+        MLN_LOG_WARN("知识库加载失败: %s", e)
         _lib = {}
 
 
-def _load_registry():
-    global _registry
-    try:
-        with open(_REGISTRY_PATH, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            _registry = list(reader)
-        MLN_LOG_INFO("类别主表加载完成，共 %d 类", len(_registry))
-    except Exception as e:
-        MLN_LOG_ERROR("类别主表加载失败: %s", e)
-        _registry = []
-
-
 _load_lib()
-_load_registry()
 
 
 @router.get("/library")
@@ -113,6 +99,7 @@ def search(q: str = Query(..., min_length=1, description="搜索关键词")):
 
 @router.get("/registry")
 def registry():
-    """类别主表（class_registry.csv）"""
-    MLN_LOG_INFO("查询类别主表，共 %d 类", len(_registry))
-    return {"success": True, "count": len(_registry), "data": _registry}
+    """类别主表（class_registry.csv，统一由 service.registry 加载）"""
+    rows = all_classes()
+    MLN_LOG_INFO("查询类别主表，共 %d 类", len(rows))
+    return {"success": True, "count": len(rows), "data": rows}

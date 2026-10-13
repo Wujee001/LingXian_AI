@@ -42,16 +42,16 @@ export function correctSheet(payload) {
 
 // ---- 知识库 ----
 export function getKbList() {
-  return request.get('/api/kb/list')
+  return request.get('/api/knowledge/library')
 }
 
 export function getKbItem(key) {
-  return request.get(`/api/kb/item/${key}`)
+  return request.get(`/api/knowledge/detail/${key}`)
 }
 
 // ---- 智能句读 ----
-export function segmentJudou(sequence) {
-  return request.post('/api/judou/segment', { sequence })
+export function segmentJudou(chars) {
+  return request.post('/api/judou/segment', { chars })
 }
 
 export default request

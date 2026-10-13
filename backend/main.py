@@ -20,7 +20,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
+from utils.mlnlog import MlnLog, LogLevel
 from api import whole_sheet, single_char, knowledge, judou
 
 app = FastAPI(title="LingXianAI 泠弦智谱", version="1.0.0")
@@ -33,15 +33,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 全局开启文件日志
+log_ins = MlnLog.initialize(level=LogLevel.DEBUG, console=True)
+log_ins.set_log_file("logs/mlnlog.log")
+
 # 静态资源（上传的整谱图）
 os.makedirs("static/upload", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 路由注册
 app.include_router(whole_sheet.router, prefix="/api/sheet", tags=["整谱打谱"])
-# app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"])
+app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"])
 app.include_router(knowledge.router, prefix="/api/knowledge", tags=["知识库"])
-# app.include_router(judou.router, prefix="/api/judou", tags=["智能句读"])
+app.include_router(judou.router, prefix="/api/judou", tags=["智能句读"])
 
 
 @app.get("/")
