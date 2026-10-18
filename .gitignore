@@ -15,7 +15,7 @@ venv/
 env/
 ENV/
 
-# ===== 模型权重（走GitHub Release，不进Git）=====
+# ===== 模型权重（走 GitHub Release，不进 Git）=====
 backend/models/*.pth
 backend/models/*.pt
 backend/models/*.onnx
@@ -24,25 +24,25 @@ backend/models/*.ckpt
 backend/models/class_mapping.json
 backend/models/best_model*
 
-# ===== 训练产物（模型线本地生成，不进Git）=====
+# ===== 训练产物 =====
 runs/
 checkpoints/
 wandb/
 lightning_logs/
 *.tensorboard
 
-# ===== 临时上传 =====
-backend/static/
+# ===== 上传与临时文件（保留 .gitkeep 占位）=====
+backend/static/upload/*
+!backend/static/upload/.gitkeep
 backend/temp_upload/*
 !backend/temp_upload/.gitkeep
 
-# ===== 运行日志 =====
-logs/
+# ===== 运行日志（保留 .gitkeep 占位）=====
 *.log
 backend/logs/*
 !backend/logs/.gitkeep
 
-# ===== 数据集图片（走网盘，不进Git）=====
+# ===== 数据集图片（走网盘，不进 Git）=====
 data/dataset/*
 !data/dataset/.gitkeep
 *.zip
@@ -58,11 +58,24 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ===== 数据库 =====
+# ===== SQLite 数据库（运行时生成，含用户哈希与内容）=====
+backend/data/app.db
+backend/data/app.db-wal
+backend/data/app.db-shm
 *.db
-*.db3
+*.db-wal
+*.db-shm
 *.sqlite
 *.sqlite3
+
+# ===== 运行期生成的内容 =====
+backend/data/history_images/
+backend/data/corrections.json
+
+# ===== 环境变量 =====
+.env
+.env.*
+!.env.example
 
 # ===== IDE / 编辑器 =====
 .vscode/

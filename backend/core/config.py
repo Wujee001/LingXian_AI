@@ -43,3 +43,19 @@ DATA_DIR = os.path.join(BACKEND_ROOT, "data")
 # 启动时确保全部目录存在
 for _dir in (STATIC_DIR, UPLOAD_DIR, TEMP_DIR, MODEL_DIR, LOG_DIR, DATA_DIR):
     os.makedirs(_dir, exist_ok=True)
+
+
+# ===== 阶段 0 认证相关（新增） =====
+
+# SQLite 数据库文件（用户、历史、笔记、审计四张表）
+DB_PATH = os.path.join(DATA_DIR, "app.db")
+
+# 历史快照图片目录（按 user_id 分子目录）
+HISTORY_IMG_DIR = os.path.join(DATA_DIR, "history_images")
+
+# token 有效期（小时）
+TOKEN_TTL_HOURS = 12
+
+# 扩展启动时创建的目录
+for _dir in (HISTORY_IMG_DIR,):
+    os.makedirs(_dir, exist_ok=True)

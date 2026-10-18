@@ -10,7 +10,7 @@
 
   后端未启动时回退内置演示数据（6 条），页面顶部标签标明来源。
 
-  作者：@zlx
+  作者：@zlxaaa
   创建日期：2026-10-13
   版本：1.0.0
 -->
@@ -77,7 +77,13 @@
               <el-tag size="small" type="info">{{ cur.type }}</el-tag>
             </div>
             <div class="p-key">拼音 key：{{ cur.char_key }}</div>
-
+<div class="p-key">
+  拼音 key：{{ cur.char_key }}
+  <el-button size="small" type="primary" plain style="float:right;margin-top:-6px"
+             @click="writeNote">
+    记一笔
+  </el-button>
+</div>
             <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
             <div class="parse">
               <div class="parse-row">
@@ -151,6 +157,9 @@ export default {
     this.loadList()
   },
   methods: {
+    writeNote() {
+  this.$router.push({ path: '/notes', query: { class_key: this.cur.char_key } })
+},
     async loadList() {
       this.loading = true
       try {

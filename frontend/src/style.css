@@ -450,3 +450,54 @@ html, body {
   border-radius: 2px;
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
 }
+
+/* ============================================================
+   阶段 0：右上角用户栏
+   ============================================================ */
+.scroll-header { position: relative; }
+
+.user-bar {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 13px;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+}
+
+.user-bar .user-name {
+  color: var(--zheshi-deep);
+}
+
+
+/* ============================================================
+   阶段 1：用户下拉
+   ============================================================ */
+.user-trigger {
+  cursor: pointer;
+  color: var(--zheshi-deep);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+.user-trigger:hover {
+  background-color: rgba(246, 238, 215, 0.6);
+}
+.user-trigger .caret {
+  font-size: 10px;
+  margin-left: 4px;
+  color: var(--ink-faint);
+}
+
+/* ============================================================
+   阶段 3：5 tab 导航宽度压缩 + 广场
+   ============================================================ */
+.scroll-nav .nav-item {
+  padding: 12px 28px;
+}
