@@ -53,7 +53,6 @@ conda create -n lingxian python=3.10 -y
 conda activate lingxian
 
 # 安装后端依赖（假模型阶段只需这些）
-cd D:\desk_item\LingXian_AI\LingXian_AI_V1.0
 pip install -r requirements.txt
 
 # 前端依赖（已装过可跳过）
@@ -70,7 +69,7 @@ npm install
 
 ```powershell
 conda activate lingxian
-cd D:\desk_item\LingXian_AI\LingXian_AI_V1.0\backend
+cd backend
 python main.py
 # 看到 Uvicorn running on http://127.0.0.1:8001 即成功
 # 接口文档：http://127.0.0.1:8001/docs
@@ -79,7 +78,7 @@ python main.py
 **终端 2 — 前端：**
 
 ```powershell
-cd D:\desk_item\LingXian_AI\LingXian_AI_V1.0\frontend
+cd frontend
 npm run dev
 # 浏览器打开 http://127.0.0.1:5173
 ```

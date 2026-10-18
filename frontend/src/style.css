@@ -1,4 +1,4 @@
-/* -*- coding: utf-8 -*-
+﻿/* -*- coding: utf-8 -*-
  *
  * 泠弦智谱 全局样式（古旧琴谱抄本风）
  *
@@ -6,8 +6,8 @@
  * 保留册页纸面、印章、木牌、夹注等传统元素质感。
  *
  * 作者：@Wujee
- * 更新日期：2026-10-13
- * 版本：1.1.0
+ * 更新日期：2026-10-18
+ * 版本：1.1.2
  */
 
 :root {
@@ -22,23 +22,23 @@
   --xuan-warm: #ede2c8;
   --xuan-deep: #dcd0b2;
 
-  /* 主色系（低饱和古朴） */
-  --zheshi: #8b5a3c;
-  --zheshi-deep: #6e4528;
+  /* 主色系（青黛墨色，低饱和古朴） */
+  --zheshi: #2c5f6e;
+  --zheshi-deep: #1e4a56;
   --zhusha: #8a352a;
   --zhusha-deep: #6d2820;
-  --zhuqing: #566a5c;
-  --zhuqing-deep: #445549;
-  --jin: #8a6f3c;
-  --wood: #7a5a3e;
+  --zhuqing: #4a7c59;
+  --zhuqing-deep: #3a6347;
+  --jin: #5a7a8c;
+  --wood: #3a5a66;
 
   /* 线条 */
-  --line: #c8b894;
-  --line-soft: #d6c8a6;
-  --line-deep: #b09e78;
+  --line: #a8b8b0;
+  --line-soft: #c0d0c8;
+  --line-deep: #88a098;
 
   /* Element Plus 变量覆盖 */
-  --el-color-primary: #8b5a3c;
+  --el-color-primary: #2c5f6e;
   --el-color-success: #566a5c;
   --el-color-warning: #8a6f3c;
   --el-color-danger: #8a352a;
@@ -63,18 +63,13 @@ html, body {
   font-size: 14px;
   line-height: 1.75;
   letter-spacing: 0.02em;
-  /* 宣纸底：纤维 + 斑驳做旧 + 柔和渐变 */
-  background-color: var(--xuan);
-  background-image:
-    repeating-linear-gradient(90deg, rgba(122, 90, 62, 0.03) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, rgba(122, 90, 62, 0.02) 0 1px, transparent 1px 5px),
-    radial-gradient(ellipse 55% 40% at 12% 15%, rgba(122, 90, 62, 0.08), transparent 65%),
-    radial-gradient(ellipse 45% 35% at 88% 78%, rgba(80, 55, 35, 0.07), transparent 65%),
-    radial-gradient(ellipse 80% 40% at 50% 108%, rgba(60, 42, 26, 0.12), transparent 70%),
-    radial-gradient(ellipse 35% 25% at 75% 8%, rgba(139, 90, 60, 0.06), transparent 70%),
-    radial-gradient(ellipse 30% 20% at 20% 90%, rgba(110, 69, 40, 0.07), transparent 70%),
-    linear-gradient(180deg, #ece1c7 0%, #e6d9bd 45%, #dfd1b3 100%);
+  /* 水彩古琴银杏背景图，左侧留白放内容 */
+  background-color: #f5f0e1;
+  background-image: url('/bg.jpg');
+  background-size: cover;
+  background-position: right center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 #app { min-height: 100vh; }
@@ -189,14 +184,15 @@ html, body {
 .nav-item {
   display: inline-flex;
   align-items: center;
-  padding: 12px 48px;
+  padding: 12px 40px;
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
   font-size: 16px;
   letter-spacing: 0.4em;
   text-indent: 0.4em;
   color: var(--ink-soft);
-  background-color: transparent;
+  background-color: rgba(255,253,245,0.6);
   border: 1px solid var(--line);
+  border-radius: 12px;
   cursor: pointer;
   user-select: none;
   transition: all 0.28s ease;
@@ -252,15 +248,14 @@ html, body {
    Element Plus 国风定制
    ============================================================ */
 
-/* ---- 卡片（古籍册页） ---- */
+/* ---- 卡片（半透宣纸毛玻璃） ---- */
 .el-card {
-  background-color: var(--xuan-card);
-  border: 1px solid var(--line-deep);
-  border-radius: 2px;
+  background-color: rgba(255, 253, 245, 0.78);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(136, 160, 152, 0.25);
+  border-radius: 16px;
   box-shadow:
-    0 1px 2px rgba(90, 70, 50, 0.06),
-    0 4px 14px rgba(90, 70, 50, 0.05),
-    0 0 0 1px rgba(255, 248, 230, 0.45) inset;
+    0 4px 20px rgba(44, 95, 110, 0.08);
   position: relative;
 }
 .el-card__body { padding: 16px 18px; }
@@ -270,14 +265,14 @@ html, body {
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
   font-size: 13.5px;
   letter-spacing: 0.18em;
-  border-radius: 2px;
-  height: 34px;
-  padding: 0 18px;
+  border-radius: 12px;
+  height: 36px;
+  padding: 0 22px;
   border: 1px solid var(--line-deep);
-  background-color: #f6eed7;
+  background-color: rgba(255,253,245,0.8);
   color: var(--ink);
   transition: all 0.25s ease;
-  box-shadow: 0 1px 0 rgba(255, 252, 240, 0.6) inset;
+  box-shadow: 0 2px 8px rgba(44, 95, 110, 0.06);
 }
 .el-button:hover,
 .el-button:focus {
