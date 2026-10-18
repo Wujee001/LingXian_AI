@@ -1,6 +1,10 @@
 # 泠弦智谱 LingXianAI
 
 古琴减字谱智能识别与打谱系统（全球校园 AI 算法精英大赛 · 泠弦智谱团队）。
+
+> **2026-10-18 `develop-x` 双模型联调修改**：本版本将 `backend/models/best.pt` 明确限定为**单类别减字定位权重**；`backend/models/stage2_best.pth` 用于 **ResNet18 八字段指法候选识别**，两者不能互换。预测不是专家确认，首次输出标为待复核。安装、接口变化和真实验收请先阅读 [双模型接入与人工复核说明](docs/双模型接入_人工复核与验收.md)。下文部分描述保留原团队 V1 背景，不代表当前双模型接口语义。
+
+
 面向古琴学习者，提供**单减字识别、指法解析、整谱打谱、节奏（句读）划分**。
 
 - 前端：Vue3 + Element-Plus + Vite（国风宣纸主题），端口 `5173`
@@ -84,8 +88,7 @@ npm run dev
 ```
 
 > 前端已配置 `/api` 代理到 `8001`，无需处理跨域。
-> **后端未启动也能演示**：页面会自动回退内置演示数据，并以「演示数据」标签标明；
-> 后端正常时标签显示「后端识别」。
+> **双模型版不再自动生成演示数据**：后端或权重未就绪时页面会明确提醒，可手动添加/修正框；正式比赛展示必须核实两个模型状态，避免误把旧演示数据当作模型能力。
 
 ---
 
@@ -101,30 +104,26 @@ npm run dev
 
 ---
 
-## 五、接入真实权重（模型线交付后）
+## 五、接入真实权重（双模型版，替代旧 V1 单模型）
 
 模型线需同时交付：
 
-1. `resnet18_qin.pth` —— ResNet18 单字分类权重；
-2. `class_mapping.json` —— 模型输出索引 → class_key 映射（缺失时按 class_registry.csv 顺序）；
-3. 预处理规格说明 —— 输入尺寸 / 归一化 / 灰度或 RGB；
-4. 版本评测说明 —— 准确率、混淆矩阵、训练数据量。
+1. `backend/models/best.pt`：**单类别减字区域检测** YOLO11n（类名须为 `jianzi`）；
+2. `backend/models/stage2_best.pth`：八字段 ResNet18 多任务分类权重，内含 vocab，不是旧单输出 `resnet18_qin.pth`；
+3. 相应的独立测试结果和训练版本信息。
 
-接入步骤：
+安装后端推理依赖后重启：
 
 ```powershell
-# 1. 安装推理依赖（CPU 版，仅首次）
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-# 2. 权重放入（不进 Git）
-#    backend/models/resnet18_qin.pth
-#    backend/models/class_mapping.json
+python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements.txt
+cd backend
+python main.py
 ```
 
-重启后端，`classifier.py` 会自动检测并加载权重；加载失败（未装 torch、
-权重缺失或损坏、类别数不符）会记录告警并自动回退假模型，**接口与前端无需改动**。
+`GET /api/sheet/model-status` 应显示两个 `available: true`。默认只产生 **待人工复核的指法属性候选**；旧25类知识库仍可通过手动 `class_key` 检索，但模型不会凭单类别检测 id 猜完整指法。具体步骤见 [双模型接入与验收](docs/双模型接入_人工复核与验收.md)。
 
-权重文件较大，不提交 Git，通过 GitHub Release 或手动拷贝分发。
+**权重不进 Git**：单独放置或由模型线发布，不随源码上传。
 
 ---
 
@@ -133,6 +132,6 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 - **端口被占用**：后端改 `uvicorn main:app --reload --port 8002`，同步改 `frontend/vite.config.js` 代理目标。
 - **npm install 卡住**：确认已设淘宝镜像 `npm config get registry`。
 - **ModuleNotFoundError**：确认已 `conda activate lingxian` 且在项目根执行过 `pip install -r requirements.txt`。
-- **识别结果固定**：权重未接入时为假模型兜底，属正常现象。
+- **后端没有模型候选**：检查 `/api/sheet/model-status` 和两个权重是否放对路径，不再把演示输出当成真实结果。
 - **整谱未出框**：规则检测对图片质量敏感，换背景干净、字块清晰、无大段批注的谱图。
 - **中文路径报错**：项目路径保持纯英文，勿放在含中文的父目录下。

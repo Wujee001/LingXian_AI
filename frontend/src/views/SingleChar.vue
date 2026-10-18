@@ -65,15 +65,33 @@
                 多模态重认
               </el-button>
             </div>
-            <el-radio-group v-model="pick" @change="reparse">
+            <div v-if="source === 'stage2'" class="stage2-hint">
+              <strong>八字段视觉识别候选（尚未人工确认）</strong>
+              <p>模型逐项猜测减字明写的信息。NA＝本框未明写，不表示散音或已继承徽位。</p>
+              <div class="attributes-grid">
+                <div v-for="f in attributeFields" :key="f[0]" class="attribute-field">
+                  <label>{{ f[1] }}</label>
+                  <el-select v-model="selectedAttrs[f[0]]" size="small" filterable
+                             allow-create default-first-option @change="onAttributeChanged">
+                    <el-option v-for="op in (attributesTop3[f[0]] || [])" :key="op.value"
+                               :value="op.value" :label="op.value + '（' + (op.score * 100).toFixed(0) + '%）'" />
+                  </el-select>
+                </div>
+              </div>
+              <el-button type="success" size="small" style="width:100%;margin-top:12px"
+                         :disabled="confirmed" @click="confirmAttributes">
+                {{ confirmed ? '已人工确认并保存' : '人工核对后确认并保存' }}
+              </el-button>
+            </div>
+            <el-radio-group v-if="source !== 'stage2' && result.length" v-model="pick" @change="reparse">
               <el-radio v-for="c in result" :key="c[0]" :label="c[0]"
                         border size="small" class="cand">
                 {{ c[0] }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
               </el-radio>
             </el-radio-group>
 
-            <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
-            <div class="parse">
+            <div class="blk"><span class="blk-orn">○</span> {{ source === 'stage2' ? '指法属性候选解释' : '指法释义' }}</div>
+            <div class="parse" v-if="parse">
               <div class="parse-row">
                 <span class="k">右 手</span>{{ parse.right_hand.finger }} · {{ parse.right_hand.string }}
               </div>
@@ -95,15 +113,26 @@
  * 埋点 logger.js，后端业务日志统一 mlnlog。
  */
 import { ElMessage } from 'element-plus'
-import { predictSingle } from '../api/index.js'
+import { predictSingle, parseAttributes, correctSheet } from '../api/index.js'
 import { logInfo, logWarn } from '../logger.js'
 
 // 弦序 / 徽位数字转中文
 const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
 const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
+const ATTR_FIELDS = [['rh','右手动作'],['string','弦序'],['lh','左手按指'],
+  ['hui_base','徽位'],['hui_frac','徽分'],['mod','技法'],['tone','音类'],['strings','复合弦序']]
 
 export default {
   name: 'SingleChar',
+  computed: {
+    attributeFields() { return ATTR_FIELDS },
+    sourceLabel() {
+      if (!this.fromBackend) return '等待后端结果'
+      if (this.source === 'stage2') return 'ResNet18 八字段候选 · 待人工核验'
+      if (this.source === 'qwen') return '多模态候选 · 待人工核验'
+      return '后端识别候选'
+    }
+  },
   data() {
     return {
       rawFile: null,
@@ -114,20 +143,20 @@ export default {
       fromBackend: false,
       source: '',
       engine: 'auto',
-      recognizing: false
+      recognizing: false,
+      attributesTop3: {},
+      selectedAttrs: {},
+      confirmed: false
     }
   },
   methods: {
-    sourceLabel() {
-      if (!this.fromBackend) return '演示数据'
-      if (this.source === 'yolo') return '本地模型识别'
-      if (this.source === 'qwen') return '多模态识别'
-      return '后端识别'
-    },
     onPick(file) {
       this.rawFile = file.raw
       this.imageUrl = URL.createObjectURL(file.raw)
       this.result = null
+      this.attributesTop3 = {}
+      this.selectedAttrs = {}
+      this.confirmed = false
       this.fromBackend = false
       this.source = ''
       logInfo('选择单减字图', file.name)
@@ -144,50 +173,66 @@ export default {
           throw new Error('后端返回结构异常')
         }
         this.result = body.data.candidates.map(c => [c.class_key, c.confidence])
-        this.pick = body.data.top_key || this.result[0][0]
+        this.pick = body.data.top_key || (this.result.length ? this.result[0][0] : '')
+        this.attributesTop3 = body.data.attributes_top3 || {}
+        this.selectedAttrs = { ...(body.data.attributes_selected || {}) }
+        this.confirmed = false
         this.parse = this.fmtParse(body.data.parse_result, this.pick)
         this.fromBackend = true
         this.source = body.data.source || 'yolo'
         logInfo('单减字识别完成（后端）', this.pick)
       } catch (e) {
-        // 后端不可用：回退内置假数据
-        logWarn('后端单字识别不可用，回退演示数据', e && e.message)
-        ElMessage.warning('后端未连接或识别异常，当前使用演示数据')
-        this.result = [
-          ['da_9_gou_4', 0.82],
-          ['san_tiao_7', 0.11],
-          ['gou_5', 0.04]
-        ]
-        this.pick = this.result[0][0]
-        this.parse = this.fakeParse(this.pick)
+        // 不再静默用演示数据代替真实模型输出。
+        logWarn('后端单字识别不可用', e && e.message)
+        const detail = e?.response?.data?.detail || e?.message || '请确认已部署 stage2_best.pth'
+        ElMessage.error(`识别未完成：${detail}`)
+        this.result = null
+        this.parse = null
         this.fromBackend = false
-        this.source = 'fake'
-        logInfo('单减字识别完成（演示）', this.pick)
+        this.source = 'unavailable' 
       } finally {
         this.recognizing = false
       }
     },
     // 把后端 parse_result 归一化为模板展示结构（兼容左右手为 null、string 为数字）
     fmtParse(p, key) {
-      if (!p) return this.fakeParse(key)
+      if (!p) return { right_hand:{finger:'—',string:'—'}, left_hand:{finger:'—',hui:'—'}, meaning:'暂无有效候选，请检查模型' }
       const rh = p.right_hand || {}
       const lh = p.left_hand
       return {
         right_hand: {
           finger: rh.finger || '—',
-          string: rh.string != null ? (XIAN[rh.string] || String(rh.string)) + '弦' : '—'
+          string: rh.string == null ? '—' : (/^[1-7]$/.test(String(rh.string)) ? (XIAN[rh.string] || String(rh.string)) + '弦' : String(rh.string))
         },
         left_hand: lh
-          ? { finger: lh.finger || '—', hui: lh.hui != null ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : '—' }
-          : { finger: '散音（不按弦）', hui: '—' },
+          ? { finger: lh.finger || '—', hui: lh.hui == null ? '—' : (/^\d+$/.test(String(lh.hui)) ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : String(lh.hui)) }
+          : { finger: '未明写', hui: '—' },
         meaning: p.meaning || '暂未收录该减字释义'
       }
     },
-    fakeParse(key) {
-      return {
-        right_hand: { finger: '勾', string: '三弦' },
-        left_hand: { finger: '散音（不按弦）', hui: '—' },
-        meaning: '【演示数据】右手中指向内弹三弦，散音，无需左手按弦。'
+    async onAttributeChanged() {
+      this.confirmed = false
+      try {
+        const res = await parseAttributes(this.selectedAttrs)
+        this.parse = this.fmtParse(res.data.data, '')
+      } catch (e) {
+        logWarn('属性展示刷新失败', e?.message)
+      }
+    },
+    async confirmAttributes() {
+      try {
+        const res = await correctSheet({
+          image_url: null, index: 0, box: null,
+          source: 'stage2_single', origin_key: null, confirmed_key: null,
+          attributes_selected: this.selectedAttrs,
+          attributes_top3: this.attributesTop3,
+          note: '用户在单减字页面核对并确认八字段'
+        })
+        if (!res?.data?.success) throw new Error('保存失败')
+        this.confirmed = true
+        ElMessage.success('已保存人工核对的属性；不等于自动完成完整谱理解析')
+      } catch (e) {
+        ElMessage.error('保存人工确认失败，请检查后端')
       }
     },
     reparse(key) {
@@ -298,6 +343,10 @@ export default {
   margin-left: 4px;
 }
 
+.stage2-hint { padding:12px;background:rgba(246,238,215,.6);border:1px solid var(--line-soft);margin:10px 0; }
+.stage2-hint p {font-size:12px;line-height:1.6;color:var(--ink-faint)}
+.attributes-grid {display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.attribute-field label {display:block;font-size:12px;margin-bottom:4px;color:var(--ink-faint)}
 .parse {
   font-family: 'SimSun', 'Songti SC', serif;
   font-size: 13px;

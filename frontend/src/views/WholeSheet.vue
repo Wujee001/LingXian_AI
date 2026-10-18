@@ -41,7 +41,7 @@
       </div>
     </el-card>
 
-    <div v-if="items.length" class="work">
+    <div v-if="imageUrl" class="work">
       <el-card shadow="never" class="canvas-card leaf">
         <SheetCanvas :image-url="imageUrl" v-model:boxes="items"
                      @select="onSelect" @box-added="onBoxAdded" />
@@ -54,12 +54,34 @@
           <div class="p-title">
             <span>第 {{ selectedIdx + 1 }} 字</span>
             <el-tag size="small" :type="cur.status === 'U' ? 'danger' : 'success'">
-              {{ cur.status === 'U' ? '待复核' : '已确认' }}
+              {{ cur.status === 'A' ? '已人工确认' : '待复核' }}
             </el-tag>
           </div>
 
           <div class="blk"><span class="blk-orn">○</span> 识别候选</div>
 
+          <div v-if="cur.detection_confidence != null" class="hint-hint">
+            定位置信度 {{ (cur.detection_confidence * 100).toFixed(0) }}% · 指法为独立模型候选
+          </div>
+          <div v-if="cur.attributes_top3 && Object.keys(cur.attributes_top3).length" class="attributes-grid">
+            <div v-for="f in attributeFields" :key="f[0]" class="attribute-field">
+              <label>{{ f[1] }}</label>
+              <el-select v-model="cur.attributes_selected[f[0]]" size="small"
+                         filterable allow-create default-first-option
+                         @change="onAttributeChanged">
+                <el-option v-for="op in (cur.attributes_top3[f[0]] || [])"
+                           :key="op.value" :label="op.value + '（' + (op.score * 100).toFixed(0) + '%）'"
+                           :value="op.value" />
+              </el-select>
+            </div>
+            <p class="model-caution">八字段是 AI 猜测，NA 表示字中未明写；可手动修改后点击「确认」。</p>
+            <div class="manual-key-row">
+              <label>完整减字知识库键（选填）</label>
+              <el-input v-model="cur.pick" size="small" placeholder="可选：如 ming_10_gou_4"
+                        @change="onKeyChanged" />
+              <span class="model-caution">只有与知识库匹配、经人工确认的完整类别才能送入句读模块。</span>
+            </div>
+          </div>
           <!-- 识别中 -->
           <div v-if="cur.recognizing" class="hint-hint">识别中，请稍候…</div>
 
@@ -77,7 +99,7 @@
             <div v-if="cur.raw_label" class="raw-lbl">
               本地模型初判：{{ cur.raw_label }}
             </div>
-            本地模型未给出可靠类别，可改用多模态认字
+            模型未提供可直接对应知识库的整字类别。请核对上方属性候选，或选择多模态重认。
             <div class="retry-row">
               <el-button size="small" type="primary" plain class="retry-btn"
                          :loading="cur.recognizing" @click="retryRecognize('qwen')">
@@ -94,11 +116,11 @@
           <div class="parse">
             <div class="parse-row">
               <span class="k">右 手</span>
-              {{ cur.parse_result ? cur.parse_result.right_hand.finger : '—' }} · {{ cur.parse_result ? cur.parse_result.right_hand.string : '—' }}
+              {{ cur.parse_result?.right_hand?.finger || '—' }} · {{ cur.parse_result?.right_hand?.string ?? '—' }}
             </div>
             <div class="parse-row">
               <span class="k">左 手</span>
-              {{ cur.parse_result ? cur.parse_result.left_hand.finger : '—' }} · {{ cur.parse_result ? cur.parse_result.left_hand.hui : '—' }}
+              {{ cur.parse_result?.left_hand?.finger || '—' }} · {{ cur.parse_result?.left_hand?.hui ?? '—' }}
             </div>
             <div class="meaning">{{ cur.parse_result ? cur.parse_result.meaning : '暂无释义' }}</div>
           </div>
@@ -136,7 +158,7 @@
       <div class="seq">
         <template v-for="(it, i) in items" :key="i">
           <el-tag :type="it.status === 'U' ? 'danger' : 'info'" size="small" class="seq-tag">
-            {{ it.pick }}
+            {{ it.pick === '待人工确认' ? (it.attributes_selected?.rh || 'NA') + '/' + (it.attributes_selected?.string || 'NA') : it.pick }}
           </el-tag>
           <span v-if="it.rhythm && it.rhythm !== 'C'" class="rh">{{ it.rhythm }}</span>
         </template>
@@ -148,10 +170,13 @@
 <script>
 import { ElMessage } from 'element-plus'
 import SheetCanvas from '../components/SheetCanvas.vue'
-import { uploadSheet, correctSheet, segmentJudou, predictSingle } from '../api/index.js'
+import { uploadSheet, correctSheet, segmentJudou, predictSingle, parseAttributes, getKbItem } from '../api/index.js'
 import { logInfo, logWarn } from '../logger.js'
 
-const KEY_POOL = ['da_9_gou_4', 'san_tiao_7', 'gou_5', 'ming_10_gou_5', 'tiao_6']
+const ATTR_FIELDS = [
+  ['rh','右手动作'],['string','弦序'],['lh','左手按指'],
+  ['hui_base','徽位'],['hui_frac','徽分'],['mod','技法'],['tone','音类'],['strings','复合弦序']
+]
 
 const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
 const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
@@ -159,6 +184,17 @@ const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7:
 export default {
   name: 'WholeSheet',
   components: { SheetCanvas },
+  computed: {
+    attributeFields() { return ATTR_FIELDS },
+    cur() { return this.selectedIdx === null ? null : (this.items[this.selectedIdx] || null) },
+    sourceLabel() {
+      if (this.source === 'stage1_yolo+stage2') return 'YOLO定位 + ResNet18候选（待核）'
+      if (this.source === 'stage1_yolo_only') return '仅YOLO定位（指法待填）'
+      if (this.source === 'stage1_yolo+qwen') return 'YOLO定位 + 多模态候选（待核）'
+      if (this.source === 'unavailable') return '模型不可用 · 请手动画框'
+      return '尚未识别'
+    }
+  },
   data() {
     return {
       rawFile: null,
@@ -167,22 +203,11 @@ export default {
       items: [],
       selectedIdx: null,
       fromBackend: false,
-      source: '',          // yolo / qwen / fake
+      source: '',          // stage1_yolo+stage2 / stage1_yolo_only / qwen
       engine: 'auto',      // auto / yolo / qwen（用户手动切换）
       backendImageUrl: '', // 后端保存的谱图地址（随人工修正回传）
       detecting: false,
       judouLoading: false
-    }
-  },
-  computed: {
-    cur() {
-      return this.selectedIdx === null ? null : this.items[this.selectedIdx]
-    },
-    sourceLabel() {
-      if (!this.fromBackend) return '演示数据'
-      if (this.source === 'yolo') return '本地模型识别'
-      if (this.source === 'qwen') return '多模态识别'
-      return '后端识别'
     }
   },
   methods: {
@@ -213,31 +238,36 @@ export default {
           y: it.box.y,
           w: it.box.w,
           h: it.box.h,
-          status: it.status || 'A',
+          status: 'U', // 没有人工确认的结果不能自动标为A
           candidates: (it.candidates || []).map(c => [c[0], c[1]]),
-          pick: (it.candidates && it.candidates[0] && it.candidates[0][0]) || 'unknown',
+          pick: (it.candidates && it.candidates[0] && it.candidates[0][0]) || '待人工确认',
+          key_verified: false,
           raw_label: it.raw_label || '',
-          rhythm: 'C',
+          rhythm: 'U',
           rhythmConf: null,
           parse_result: this.fmtParse(it.parse_result),
+          attributes_top3: it.attributes_top3 || {},
+          attributes_selected: { ...(it.attributes_selected || {}) },
+          detection_confidence: it.detection_confidence,
+          review_reasons: it.review_reasons || [],
           recognizing: false
         }))
         this.fromBackend = true
-        this.source = body.data.source || 'yolo'
+        this.source = body.data.source || 'unavailable'
         this.backendImageUrl = body.data.image_url || ''
         logInfo('整谱检测完成（后端）', `共 ${this.items.length} 框，来源=${this.source}`)
-        if (!this.items.length) ElMessage.info('后端未检测到减字框，可换用背景干净的谱图或手动画框')
+        if (body.data.warning) ElMessage.warning(body.data.warning)
+        if (!this.items.length) ElMessage.info('暂无模型框，可在左侧手动添加')
       } catch (e) {
-        logWarn('后端整谱检测不可用，回退模拟框', e && e.message)
-        ElMessage.warning('后端未连接或检测异常，当前使用演示框')
-        this.items = this.buildFakeBoxes()
+        logWarn('后端整谱检测不可用：不生成假框', e && e.message)
+        ElMessage.error('后端不可用：没有产生模型预测框，可手动添加框')
+        this.items = []
         this.fromBackend = false
-        this.source = 'fake'
-        logInfo('一键画框完成（演示）', `共 ${this.items.length} 框`)
+        this.source = 'unavailable' 
       } finally {
         this.detecting = false
       }
-      if (this.items.length) await this.fetchJudou()
+      // 不自动运行句读：模型尚未确认减字且旧句读可能为演示规则。
     },
 
     // 手动画框后：裁剪 → 单字识别（可强制引擎）→ 回填
@@ -255,16 +285,18 @@ export default {
           throw new Error('识别返回异常')
         }
         it.candidates = body.data.candidates.map(c => [c.class_key, c.confidence])
-        it.pick = body.data.top_key || (it.candidates[0] && it.candidates[0][0]) || 'unknown'
+        it.pick = body.data.top_key || (it.candidates[0] && it.candidates[0][0]) || '待人工确认'
         it.parse_result = this.fmtParse(body.data.parse_result)
-        if (it.candidates.length) {
-          it.status = (it.candidates[0][1] >= 0.6) ? 'A' : 'U'
-        }
+        it.attributes_top3 = body.data.attributes_top3 || {}
+        it.attributes_selected = { ...(body.data.attributes_selected || {}) }
+        it.review_reasons = body.data.review_reasons || []
+        it.status = 'U'
+        it.key_verified = false
         logInfo('手动框识别完成', it.pick)
       } catch (e) {
         logWarn('手动框识别失败', e && e.message)
         it.candidates = []
-        it.pick = 'unknown'
+        it.pick = '待人工确认'
         it.parse_result = this.emptyParse()
         it.status = 'U'
         ElMessage.warning('新框识别失败，可调整框后重试，或检查后端')
@@ -317,15 +349,23 @@ export default {
       }
     },
 
-    // 调 /api/judou/segment 得到逐字 C/S/L/E
+    // 仅提交人工已确认的 class_key；不把属性字典误送到旧句读接口。
     async fetchJudou() {
       if (!this.items.length) return
+      if (this.items.some(it => it.status !== 'A' || !it.key_verified)) {
+        ElMessage.warning('句读需要每个框都有人工确认且知识库可匹配的完整类别键')
+        return
+      }
       this.judouLoading = true
       try {
         const chars = this.items.map(it => it.pick)
         const res = await segmentJudou(chars)
         const body = res && res.data
         const segs = (body && body.success && body.data && body.data.segments) || []
+        if (body.data.source === 'fake') {
+          ElMessage.warning('句读接口返回演示规则，未应用为实际打谱结果')
+          return
+        }
         if (!Array.isArray(segs) || !segs.length) throw new Error('句读返回为空')
         segs.forEach(s => {
           const it = this.items[s.index]
@@ -342,66 +382,52 @@ export default {
       }
     },
 
-    buildFakeBoxes() {
-      const boxes = []
-      const cols = 3, rows = 4
-      const cw = 0.22, ch = 0.16, gx = 0.07, gy = 0.06, x0 = 0.1, y0 = 0.08
-      for (let c = 0; c < cols; c++) {
-        const x = 1 - x0 - (c + 1) * cw - c * gx
-        for (let r = 0; r < rows; r++) {
-          boxes.push({
-            x: Number(x.toFixed(4)),
-            y: Number((y0 + r * (ch + gy)).toFixed(4)),
-            w: cw, h: ch
-          })
-        }
-      }
-      return boxes.map((b, i) => this.fakeItem(b, i))
-    },
-    fakeItem(box, i) {
-      const k0 = KEY_POOL[i % KEY_POOL.length]
-      return {
-        ...box,
-        status: i % 5 === 4 ? 'U' : 'A',
-        candidates: [
-          [k0, 0.82],
-          [KEY_POOL[(i + 1) % KEY_POOL.length], 0.11],
-          [KEY_POOL[(i + 2) % KEY_POOL.length], 0.04]
-        ],
-        pick: k0,
-        rhythm: 'C',
-        rhythmConf: null,
-        parse_result: this.fakeParse(k0),
-        recognizing: false
-      }
-    },
-
     fmtParse(p) {
-      if (!p) return this.fakeParse('unknown')
+      if (!p) return this.emptyParse()
       const rh = p.right_hand || {}
       const lh = p.left_hand
       return {
         right_hand: {
           finger: rh.finger || '—',
-          string: rh.string != null ? (XIAN[rh.string] || String(rh.string)) + '弦' : '—'
+          string: rh.string == null ? '—' : (/^[1-7]$/.test(String(rh.string)) ? (XIAN[rh.string] || String(rh.string)) + '弦' : String(rh.string))
         },
         left_hand: lh
-          ? { finger: lh.finger || '—', hui: lh.hui != null ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : '—' }
-          : { finger: '散音（不按弦）', hui: '—' },
+          ? { finger: lh.finger || '—', hui: lh.hui == null ? '—' : (/^\d+$/.test(String(lh.hui)) ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : String(lh.hui)) }
+          : { finger: '未明写', hui: '—' },
         meaning: p.meaning || '暂未收录该减字释义'
       }
     },
-    fakeParse(key) {
-      return {
-        right_hand: { finger: '勾', string: '三弦' },
-        left_hand: { finger: '散音（不按弦）', hui: '—' },
-        meaning: '【演示数据】右手中指向内弹三弦，散音。'
-      }
-    },
-
     onSelect(i) {
       this.selectedIdx = i
       if (i !== null) logInfo('选中减字', this.items[i].pick)
+    },
+    async onKeyChanged() {
+      if (!this.cur) return
+      this.cur.status = 'U'
+      this.cur.key_verified = false
+      const key = (this.cur.pick || '').trim()
+      if (!key || key === '待人工确认') return
+      try {
+        const res = await getKbItem(key)
+        this.cur.parse_result = this.fmtParse(res.data.data)
+        this.cur.key_verified = true
+        ElMessage.success('知识库已找到该减字，仍需点击确认')
+      } catch (_) {
+        ElMessage.warning('知识库未找到该类别；可只保存八字段，不能自动句读')
+      }
+    },
+    async onAttributeChanged() {
+      if (!this.cur) return
+      this.cur.status = 'U'
+      // 八字段修改后，原整字类别不再当然成立，必须重新核对。
+      this.cur.key_verified = false
+      if (this.cur.pick && this.cur.pick !== '待人工确认') this.cur.pick = '待人工确认'
+      try {
+        const res = await parseAttributes(this.cur.attributes_selected)
+        this.cur.parse_result = this.fmtParse(res.data.data)
+      } catch (err) {
+        logWarn('属性释义刷新失败', err?.message)
+      }
     },
     reparse(key) {
       this.cur.parse_result = {
@@ -418,9 +444,15 @@ export default {
     },
 
     async confirmItem() {
-      this.cur.status = 'A'
-      logInfo('确认减字', this.cur.pick)
-      await this._reportCorrect(this.cur.pick)
+      if (this.cur.pick && this.cur.pick !== '待人工确认' && !this.cur.key_verified) {
+        await this.onKeyChanged()
+        if (!this.cur.key_verified) {
+          ElMessage.warning('整字类别无法匹配知识库；请清空后只保存八字段，或填写正确类别键')
+          return
+        }
+      }
+      const ok = await this._reportCorrect(this.cur.pick === '待人工确认' ? null : this.cur.pick)
+      if (ok) { this.cur.status = 'A'; ElMessage.success('人工确认已保存') }
     },
     async markReview() {
       this.cur.status = 'U'
@@ -435,11 +467,18 @@ export default {
           box: { x: this.cur.x, y: this.cur.y, w: this.cur.w, h: this.cur.h },
           origin_key: (this.cur.candidates && this.cur.candidates[0] && this.cur.candidates[0][0]) || null,
           confirmed_key: confirmedKey,
-          source: this.fromBackend ? this.source : 'fake'
+          source: this.source,
+          attributes_selected: this.cur.attributes_selected,
+          attributes_top3: this.cur.attributes_top3,
+          detection_confidence: this.cur.detection_confidence,
+          rhythm: this.cur.rhythm
         })
         logInfo('修正回流成功', `index=${this.selectedIdx} key=${confirmedKey}`)
+        return true
       } catch (e) {
-        logWarn('修正回流失败（不影响本地显示）', e && e.message)
+        logWarn('修正回流失败', e && e.message)
+        ElMessage.error('人工确认未保存，请检查后端')
+        return false
       }
     },
 
@@ -451,9 +490,10 @@ export default {
     exportResult() {
       const lines = this.items.map((it, i) => {
         const rh = it.rhythm && it.rhythm !== 'C' ? `  [${it.rhythm}]` : ''
-        return `${String(i + 1).padStart(2, '0')}. ${it.pick}${rh}`
+        return `${String(i + 1).padStart(2, '0')}. ${it.pick || '待人工确认'}${rh}  [${it.status === 'A' ? '人工已确认' : 'AI候选待复核'}]  属性：${JSON.stringify(it.attributes_selected || {})}`
       })
-      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：${this.sourceLabel}\n\n${lines.join('\n')}\n`
+      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：${this.sourceLabel}
+提示：模型属性仅为候选，不代表自动完成谱理、句读；以人工确认记录为准。\n\n${lines.join('\n')}\n`
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
@@ -576,6 +616,11 @@ export default {
   letter-spacing: 0.06em;
 }
 
+.attributes-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0 12px; }
+.attribute-field label { display:block; font-size:12px; margin-bottom:4px; color:var(--ink-faint); }
+.model-caution { font-size:11px; line-height:1.6; grid-column:1 / -1; color:var(--zhusha-deep); margin:2px 0; }
+.manual-key-row {grid-column:1 / -1;}
+.manual-key-row label {font-size:12px;color:var(--ink-faint);display:block;margin-bottom:5px;}
 .actions { margin-top: 18px; display: flex; gap: 10px; }
 
 .seq-card { margin-top: 16px; }

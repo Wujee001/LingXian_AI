@@ -76,6 +76,14 @@ export function uploadSheet(file, engine = 'auto') {
   return request.post('/api/sheet/upload', fd, { timeout: 300000 })
 }
 
+export function parseAttributes(attributes) {
+  return request.post('/api/char/parse-attributes', { attributes })
+}
+
+export function getModelStatus() {
+  return request.get('/api/sheet/model-status')
+}
+
 export function correctSheet(payload) {
   return request.post('/api/sheet/correct', payload)
 }

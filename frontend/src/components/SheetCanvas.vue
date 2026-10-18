@@ -29,10 +29,11 @@
       </span>
     </div>
 
-    <div ref="stage" class="stage"
-         @mousedown="onDown" @mousemove="onMove" @mouseup="onUp"
-         @mouseleave="onUp">
-      <img ref="img" :src="imageUrl" class="sheet-img" alt="整谱" draggable="false" />
+    <div class="stage">
+      <div ref="imageLayer" class="image-layer"
+           @mousedown="onDown" @mousemove="onMove" @mouseup="onUp"
+           @mouseleave="onUp">
+        <img ref="img" :src="imageUrl" class="sheet-img" alt="整谱" draggable="false" />
 
       <div v-for="(b, i) in boxes" :key="i"
            class="box" :class="boxClass(b, i)" :style="boxStyle(b)"
@@ -41,7 +42,8 @@
         <span v-if="b.recognizing" class="recog">…</span>
       </div>
 
-      <div v-if="drawing" class="box drawing" :style="boxStyle(draftBox)"></div>
+        <div v-if="drawing" class="box drawing" :style="boxStyle(draftBox)"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -74,7 +76,8 @@ export default {
       logInfo(this.addMode ? '进入画框模式' : '退出画框模式')
     },
     norm(e) {
-      const r = this.$refs.stage.getBoundingClientRect()
+      // 坐标必须以实际图片容器为基准，而非有内边距的 stage。
+      const r = this.$refs.imageLayer.getBoundingClientRect()
       return {
         x: Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1),
         y: Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1)
@@ -114,17 +117,20 @@ export default {
         this.draftBox = this.rectOf(this.startPt, p)
       } else if (this.dragIdx !== null) {
         const b = this.boxes[this.dragIdx]
+        // 移动后旧预测不再对应当前框；要求用户重新识别并确认。
+        b.status = 'U'
+        b.key_verified = false
         b.x = Math.min(Math.max(p.x - this.dragOff.x, 0), 1 - b.w)
         b.y = Math.min(Math.max(p.y - this.dragOff.y, 0), 1 - b.h)
       }
     },
     onUp() {
       if (this.drawing) {
-        if (this.draftBox.w > 0.02 && this.draftBox.h > 0.02) {
+        if (this.draftBox.w > 0.004 && this.draftBox.h > 0.004) {
           // 先压入一个占位空壳，父组件收到 box-added 后会去识别并回填
           this.boxes.push({
             ...this.draftBox,
-            status: 'A',
+            status: 'U',
             candidates: [],
             pick: 'unknown',
             rhythm: 'C',
@@ -210,6 +216,10 @@ export default {
     repeating-linear-gradient(45deg, rgba(139, 90, 60, 0.02) 0 2px, transparent 2px 6px);
   border: 1px solid var(--line);
   border-radius: 2px;
+}
+.image-layer {
+  position: relative;
+  width: 100%;
 }
 .sheet-img {
   width: 100%;

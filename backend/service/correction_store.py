@@ -67,6 +67,10 @@ def append(record: dict) -> int:
                 "confirmed_key": record.get("confirmed_key"),
                 "source": record.get("source"),
                 "note": record.get("note"),
+                "attributes_selected": record.get("attributes_selected"),
+                "attributes_top3": record.get("attributes_top3"),
+                "detection_confidence": record.get("detection_confidence"),
+                "rhythm": record.get("rhythm"),
             }
             rows.append(item)
             os.makedirs(DATA_DIR, exist_ok=True)
