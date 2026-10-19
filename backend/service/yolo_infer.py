@@ -14,8 +14,7 @@
          recognize(img)   整谱：排序后的 [{box, class_key, confidence}]
          classify(pil)    单字：Top-3 [(class_key, confidence), ...]
     4. 未安装 ultralytics / 无权重 / 权重损坏 / 推理异常时，
-       available() 返回 False，由上层走「阿里云多模态 -> 假数据」降级，
-       本模块不抛异常打断业务。
+       available() 返回 False，上层直接返回错误提示，不做云API降级。
 
 注意：图片一律转成 numpy 数组再送入模型，规避 ultralytics/cv2
 对中文路径 imread 失败的问题。
@@ -73,7 +72,7 @@ def _ensure_model() -> bool:
     _checked = True
 
     if not os.path.exists(_WEIGHT_PATH):
-        MLN_LOG_WARN("未发现 YOLO 权重 %s，识别将走多模态/假数据兜底", _WEIGHT_PATH)
+        MLN_LOG_WARN("未发现 YOLO 权重 %s，检测功能不可用", _WEIGHT_PATH)
         _ready = False
         return False
 
@@ -91,7 +90,7 @@ def _ensure_model() -> bool:
                      sum(1 for v in _name_to_key.values() if v))
         return True
     except Exception as e:
-        MLN_LOG_EXCEPTION("YOLO 权重加载失败，降级多模态/假数据：%s", e)
+        MLN_LOG_EXCEPTION("YOLO 权重加载失败：%s", e)
         _model, _ready = None, False
         return False
 

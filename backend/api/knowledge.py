@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-知识库接口：容错处理，对接parser结构化输出
+知识库接口：直接使用parser输出，分类正确，无需前端二次处理
 """
 from fastapi import APIRouter, HTTPException, Query
 from service.registry import all_classes
@@ -19,20 +19,18 @@ def _build_full_lib():
         key = row["class_key"]
         try:
             parse = char_parse(key)
-        except Exception as e:
-            MLN_LOG_INFO("解析key失败，跳过：%s", key)
+        except Exception:
             continue
         item = {
             "char_key": key,
             "raw_key": key,
             "display": parse["display_name"],
             "type": parse["category"],
-            "right_hand_text": parse["right_hand"]["text"],
-            "left_hand_text": parse["left_hand"]["text"],
+            "right_hand_text": parse["right_hand_text"],
+            "left_hand_text": parse["left_hand_text"],
             "desc": parse["desc"],
-            "meaning": parse["desc"],
-            "is_san": parse["category"] == "散音",
-            "is_fan": False,
+            "is_san": parse["is_san"],
+            "is_fan": parse["is_fan"],
         }
         lib[key] = item
     _lib = lib

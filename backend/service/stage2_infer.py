@@ -62,7 +62,7 @@ def _ensure_model():
     _checked = True
 
     if not os.path.exists(_WEIGHT_PATH):
-        MLN_LOG_WARN("未发现 Stage2 ResNet18 权重 %s，单字分类将走多模态兜底", _WEIGHT_PATH)
+        MLN_LOG_WARN("未发现 Stage2 ResNet18 权重 %s，识别功能不可用", _WEIGHT_PATH)
         _ready = False
         return False
     try:

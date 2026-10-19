@@ -40,22 +40,22 @@
                 识别有误，手动修正
               </el-button>
             </div>
-            <el-radio-group v-model="pick">
+            <el-radio-group v-model="pick" @change="updateParse">
               <el-radio v-for="c in result" :key="c[0]" :label="c[0]"
                         border size="small" class="cand">
-                {{ parse.display_name }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
+                {{ getParse(c[0]).display_name }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
               </el-radio>
             </el-radio-group>
 
             <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
             <div class="parse">
               <div class="parse-row">
-                <span class="k">右 手</span>{{ parse.right_hand.finger }} · {{ parse.right_hand.string }}
+                <span class="k">右 手</span>{{ parse.right_hand_text }}
               </div>
               <div class="parse-row">
-                <span class="k">左 手</span>{{ parse.left_hand.finger }} · {{ parse.left_hand.hui }}
+                <span class="k">左 手</span>{{ parse.left_hand_text }}
               </div>
-              <div class="meaning">{{ parse.meaning }}</div>
+              <div class="meaning">{{ parse.desc }}</div>
             </div>
           </template>
         </el-card>
@@ -83,10 +83,7 @@
 <script>
 import { ElMessage } from 'element-plus'
 import { predictSingle, submitCorrection } from '../api/index.js'
-import { logInfo, logWarn } from '../logger.js'
-
-const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
-const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
+import { logInfo } from '../logger.js'
 
 export default {
   name: 'SingleChar',
@@ -96,12 +93,18 @@ export default {
       imageUrl: '',
       result: null,
       pick: '',
-      parse: null,
+      parse: {
+        display_name: '—',
+        right_hand_text: '—',
+        left_hand_text: '—',
+        desc: '暂未收录'
+      },
       recognizing: false,
       correctDialogVisible: false,
       correctKey: '',
       submitting: false,
-      currentImageUrl: ''
+      currentImageUrl: '',
+      parseCache: {}
     }
   },
   methods: {
@@ -123,35 +126,20 @@ export default {
         this.result = body.data.candidates
         this.currentImageUrl = body.data.image_url || ''
         this.pick = body.data.top_key || this.result[0][0]
-        this.parse = this.fmtParse(body.data.parse_result)
+        this.parseCache[this.pick] = body.data.parse_result
+        this.parse = body.data.parse_result
         logInfo('单减字本地识别完成', this.pick)
       } catch (e) {
-        logWarn('单字识别失败', e && e.message)
         ElMessage.error('识别服务异常，请联系开发人员检查')
       } finally {
         this.recognizing = false
       }
     },
-    fmtParse(p) {
-      if (!p) {
-        return {
-          right_hand: { finger: '—', string: '—' },
-          left_hand: { finger: '—', hui: '—' },
-          meaning: '暂未收录该减字释义'
-        }
-      }
-      const rh = p.right_hand || {}
-      const lh = p.left_hand
-      return {
-        right_hand: {
-          finger: rh.finger || '—',
-          string: rh.string != null ? (XIAN[rh.string] || String(rh.string)) + '弦' : '—'
-        },
-        left_hand: lh
-          ? { finger: lh.finger || '—', hui: lh.hui != null ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : '—' }
-          : { finger: '散音（不按弦）', hui: '—' },
-        meaning: p.meaning || '暂未收录该减字释义'
-      }
+    getParse(key) {
+      return this.parseCache[key] || {display_name: key}
+    },
+    updateParse(key) {
+      this.parse = this.parseCache[key] || this.parse
     },
     openCorrectDialog() {
       this.correctKey = this.pick
@@ -216,26 +204,16 @@ export default {
   align-items: center;
   justify-content: center;
   background-color: rgba(246, 238, 215, 0.4);
-  background-image:
-    repeating-linear-gradient(45deg, rgba(139, 90, 60, 0.02) 0 2px, transparent 2px 6px);
   overflow: hidden;
-  transition: background-color 0.25s ease;
-}
-.drop:hover { background-color: rgba(240, 229, 200, 0.55); }
-.drop-tip {
-  color: var(--ink-faint);
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  font-size: 13px;
-  text-align: center;
-  letter-spacing: 0.15em;
 }
 .tip-char {
-  font-family: 'STXingkai', '华文行楷', 'STKaiti', 'KaiTi', serif;
-  font-size: 52px;
+  font-family: '华文行楷', 'STXingkai', '行楷', 'STKaiti', '楷体', KaiTi, serif;
+  font-size: 58px;
   color: var(--line-deep);
-  opacity: 0.55;
+  opacity: 0.6;
   line-height: 1;
   margin-bottom: 10px;
+  font-weight: normal;
 }
 .preview { max-width: 100%; max-height: 300px; }
 
@@ -284,6 +262,5 @@ export default {
   padding-top: 8px;
   border-top: 1px dashed var(--line-soft);
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  letter-spacing: 0.06em;
 }
 </style>

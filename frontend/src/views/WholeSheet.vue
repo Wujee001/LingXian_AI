@@ -57,23 +57,21 @@
           <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
           <div class="parse">
             <div class="parse-row">
-              <span class="k">右 手</span>
-              {{ cur.parse_result ? cur.parse_result.right_hand.finger : '—' }} · {{ cur.parse_result ? cur.parse_result.right_hand.string : '—' }}
+              <span class="k">右 手</span>{{ cur.parse_result.right_hand_text }}
             </div>
             <div class="parse-row">
-              <span class="k">左 手</span>
-              {{ cur.parse_result ? cur.parse_result.left_hand.finger : '—' }} · {{ cur.parse_result ? cur.parse_result.left_hand.hui : '—' }}
+              <span class="k">左 手</span>{{ cur.parse_result.left_hand_text }}
             </div>
-            <div class="meaning">{{ cur.parse_result ? cur.parse_result.meaning : '暂无释义' }}</div>
+            <div class="meaning">{{ cur.parse_result.desc }}</div>
           </div>
 
           <div class="blk">
             <span class="blk-orn">○</span> 节奏 · 句读
             <span v-if="cur.rhythmConf != null" class="conf-inline">
-              模型置信度 {{ (cur.rhythmConf * 100).toFixed(0) }}%
+              置信度 {{ (cur.rhythmConf * 100).toFixed(0) }}%
             </span>
           </div>
-          <el-select v-model="cur.rhythm" size="small" style="width:100%" @change="onRhythmChange">
+          <el-select v-model="cur.rhythm" size="small" style="width:100%">
             <el-option label="连 续（C）" value="C" />
             <el-option label="短 停（S）" value="S" />
             <el-option label="长 停（L）" value="L" />
@@ -127,10 +125,7 @@
 import { ElMessage } from 'element-plus'
 import SheetCanvas from '../components/SheetCanvas.vue'
 import { uploadSheet, submitCorrection, segmentJudou, predictSingle } from '../api/index.js'
-import { logInfo, logWarn } from '../logger.js'
-
-const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
-const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
+import { logInfo } from '../logger.js'
 
 export default {
   name: 'WholeSheet',
@@ -186,14 +181,13 @@ export default {
           raw_label: it.raw_label || '',
           rhythm: 'C',
           rhythmConf: null,
-          parse_result: this.fmtParse(it.parse_result),
+          parse_result: it.parse_result || this.emptyParse(),
           recognizing: false
         }))
         this.backendImageUrl = body.data.image_url || ''
         logInfo('整谱本地检测完成', `共 ${this.items.length} 框`)
         if (!this.items.length) ElMessage.info('未检测到减字框，请更换清晰谱图')
       } catch (e) {
-        logWarn('整谱检测失败', e && e.message)
         ElMessage.error('识别服务异常，请联系开发人员检查')
       } finally {
         this.detecting = false
@@ -205,7 +199,6 @@ export default {
       const it = this.items[idx]
       if (!it) return
       it.recognizing = true
-      logInfo('手动画框，开始识别', `index=${idx}`)
       try {
         const file = await this.cropByBox(this.imageUrl, it)
         const res = await predictSingle(file)
@@ -215,13 +208,11 @@ export default {
         }
         it.candidates = body.data.candidates
         it.pick = body.data.top_key || (it.candidates[0] && it.candidates[0][0]) || 'unknown'
-        it.parse_result = this.fmtParse(body.data.parse_result)
+        it.parse_result = body.data.parse_result
         if (it.candidates.length) {
           it.status = (it.candidates[0][1] >= 0.6) ? 'A' : 'U'
         }
-        logInfo('手动框识别完成', it.pick)
       } catch (e) {
-        logWarn('手动框识别失败', e && e.message)
         it.candidates = []
         it.pick = 'unknown'
         it.parse_result = this.emptyParse()
@@ -236,25 +227,21 @@ export default {
       return new Promise((resolve, reject) => {
         const img = new Image()
         img.onload = () => {
-          try {
-            const nw = img.naturalWidth
-            const nh = img.naturalHeight
-            const x = Math.max(0, Math.round(box.x * nw))
-            const y = Math.max(0, Math.round(box.y * nh))
-            const w = Math.max(1, Math.min(nw - x, Math.round(box.w * nw)))
-            const h = Math.max(1, Math.min(nh - y, Math.round(box.h * nh)))
-            const canvas = document.createElement('canvas')
-            canvas.width = w
-            canvas.height = h
-            const ctx = canvas.getContext('2d')
-            ctx.drawImage(img, x, y, w, h, 0, 0, w, h)
-            canvas.toBlob(blob => {
-              if (!blob) return reject(new Error('canvas 输出为空'))
-              resolve(new File([blob], 'crop.png', { type: 'image/png' }))
-            }, 'image/png')
-          } catch (e) {
-            reject(e)
-          }
+          const nw = img.naturalWidth
+          const nh = img.naturalHeight
+          const x = Math.max(0, Math.round(box.x * nw))
+          const y = Math.max(0, Math.round(box.y * nh))
+          const w = Math.max(1, Math.min(nw - x, Math.round(box.w * nw)))
+          const h = Math.max(1, Math.min(nh - y, Math.round(box.h * nh)))
+          const canvas = document.createElement('canvas')
+          canvas.width = w
+          canvas.height = h
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, x, y, w, h, 0, 0, w, h)
+          canvas.toBlob(blob => {
+            if (!blob) return reject(new Error('canvas 输出为空'))
+            resolve(new File([blob], 'crop.png', { type: 'image/png' }))
+          }, 'image/png')
         }
         img.onerror = () => reject(new Error('图片加载失败'))
         img.src = imageUrl
@@ -263,9 +250,10 @@ export default {
 
     emptyParse() {
       return {
-        right_hand: { finger: '—', string: '—' },
-        left_hand: { finger: '—', hui: '—' },
-        meaning: '暂未识别，请手动修正'
+        display_name: '—',
+        right_hand_text: '—',
+        left_hand_text: '—',
+        desc: '暂未识别，请手动修正'
       }
     },
 
@@ -285,46 +273,21 @@ export default {
             it.rhythmConf = typeof s.confidence === 'number' ? s.confidence : null
           }
         })
-        logInfo('智能句读完成', `共 ${segs.length} 条`)
       } catch (e) {
-        logWarn('句读接口不可用，节奏默认C', e && e.message)
       } finally {
         this.judouLoading = false
       }
     },
 
-    fmtParse(p) {
-      if (!p) return this.emptyParse()
-      const rh = p.right_hand || {}
-      const lh = p.left_hand
-      return {
-        right_hand: {
-          finger: rh.finger || '—',
-          string: rh.string != null ? (XIAN[rh.string] || String(rh.string)) + '弦' : '—'
-        },
-        left_hand: lh
-          ? { finger: lh.finger || '—', hui: lh.hui != null ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : '—' }
-          : { finger: '散音（不按弦）', hui: '—' },
-        meaning: p.meaning || '暂未收录该减字释义'
-      }
-    },
-
     onSelect(i) {
       this.selectedIdx = i
-      if (i !== null) logInfo('选中减字', this.items[i].pick)
     },
     reparse(key) {
       this.cur.status = 'U'
-      logWarn('切换识别候选', key)
-    },
-
-    onRhythmChange(v) {
-      logInfo('调整句读', `${this.cur.pick} → ${v}`)
     },
 
     async confirmItem() {
       this.cur.status = 'A'
-      logInfo('确认减字', this.cur.pick)
     },
 
     openCorrectDialog() {
@@ -360,13 +323,12 @@ export default {
     clearAll() {
       this.items = []
       this.selectedIdx = null
-      logInfo('清除画布')
     },
 
     exportResult() {
       const lines = this.items.map((it, i) => {
         const rh = it.rhythm && it.rhythm !== 'C' ? `  [${it.rhythm}]` : ''
-        return `${String(i + 1).padStart(2, '0')}. ${it.pick}${rh}`
+        return `${String(i + 1).padStart(2, '0')}. ${it.parse_result.display_name}${rh}`
       })
       const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：本地模型\n\n${lines.join('\n')}\n`
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
@@ -374,7 +336,6 @@ export default {
       a.href = URL.createObjectURL(blob)
       a.download = 'lingxian_result.txt'
       a.click()
-      logInfo('导出打谱结果')
     }
   }
 }
@@ -389,7 +350,6 @@ export default {
   font-family: 'SimSun', 'Songti SC', serif;
   font-size: 12px;
   color: var(--ink-faint);
-  letter-spacing: 0.02em;
 }
 
 .work { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
@@ -433,7 +393,6 @@ export default {
   font-size: 11.5px;
   font-weight: normal;
   color: var(--ink-faint);
-  letter-spacing: 0.02em;
 }
 
 .empty {
@@ -443,14 +402,12 @@ export default {
   text-align: center;
   line-height: 2.2;
   padding: 46px 0;
-  letter-spacing: 0.14em;
 }
 
 .hint-hint {
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
   font-size: 12.5px;
   color: var(--ink-faint);
-  letter-spacing: 0.1em;
   padding: 6px 0;
 }
 
@@ -480,14 +437,13 @@ export default {
   padding-top: 8px;
   border-top: 1px dashed var(--line-soft);
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  letter-spacing: 0.06em;
 }
 
 .actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
 
 .seq-card { margin-top: 16px; }
 .seq { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.seq-tag { font-family: 'Courier New', monospace; letter-spacing: 0; font-size: 11.5px; }
+.seq-tag { font-family: 'STKaiti', 'KaiTi', serif; font-size: 12px; }
 .rh {
   color: var(--zhusha-deep);
   font-family: 'STKaiti', 'KaiTi', serif;
