@@ -239,11 +239,10 @@ def recognize(image_path: str, conf: float = _CONF_THRES):
                 "raw_label": raw_name,
             })
         items = _sort_guqin(items)
-        MLN_LOG_INFO("YOLO 整谱识别完成：%d 个减字（其中 %d 个需多模态认字）",
-                     len(items), sum(1 for d in items if not d["class_key"]))
+        MLN_LOG_INFO("Stage1 YOLO 框检测完成：%d 个减字框，送入Stage2解析", len(items))
         return True, items, (w, h)
     except Exception as e:
-        MLN_LOG_EXCEPTION("YOLO 整谱推理异常，降级多模态/假数据：%s", e)
+        MLN_LOG_EXCEPTION("Stage1 YOLO 推理异常：%s", e)
         return False, [], None
 
 

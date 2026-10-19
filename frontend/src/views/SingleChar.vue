@@ -1,19 +1,4 @@
 <!-- -*- coding: utf-8 -*- -->
-<!--
-  单减字释读页面（泠弦智谱 V1）
-
-  上传单个减字图片 → 开始释读 → 输出 Top-3 候选与
-  置信度，点选候选查看指法释义（左右手/徽位/释义）。
-
-  数据来源判断型：优先调用后端 /api/char/predict；
-  后端未启动 / 报错 / 未就绪时自动回退内置假数据，
-  页面顶部以标签标明「后端识别 / 演示数据」，保证可独立演示。
-
-  作者：@zlx @Wujee
-  更新日期：2026-10-13
-  版本：1.1.0
--->
-
 <template>
   <div class="single-char">
     <el-row :gutter="16">
@@ -36,14 +21,6 @@
                      :disabled="!imageUrl" :loading="recognizing" @click="recognize">
             开始释读
           </el-button>
-          <div class="engine-bar">
-            <span class="engine-lbl">识别引擎</span>
-            <el-radio-group v-model="engine" size="small">
-              <el-radio-button label="auto">自动</el-radio-button>
-              <el-radio-button label="yolo">本地模型</el-radio-button>
-              <el-radio-button label="qwen">多模态</el-radio-button>
-            </el-radio-group>
-          </div>
         </el-card>
       </el-col>
 
@@ -57,18 +34,16 @@
           <template v-else>
             <div class="blk">
               <span class="blk-orn">○</span> 识别候选
-              <el-tag size="small" :type="fromBackend ? 'success' : 'warning'" class="src-tag">
-                {{ sourceLabel }}
-              </el-tag>
-              <el-button size="small" plain class="retry-btn" :loading="recognizing"
-                         @click="recognize('qwen')">
-                多模态重认
+              <el-tag size="small" type="success" class="src-tag">本地模型识别</el-tag>
+              <el-button size="small" plain type="warning" class="retry-btn"
+                         @click="openCorrectDialog">
+                识别有误，手动修正
               </el-button>
             </div>
-            <el-radio-group v-model="pick" @change="reparse">
+            <el-radio-group v-model="pick">
               <el-radio v-for="c in result" :key="c[0]" :label="c[0]"
                         border size="small" class="cand">
-                {{ c[0] }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
+                {{ parse.display_name }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
               </el-radio>
             </el-radio-group>
 
@@ -86,19 +61,30 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!-- 手动修正弹窗 -->
+    <el-dialog v-model="correctDialogVisible" title="手动修正识别结果" width="420px">
+      <el-form label-width="90px">
+        <el-form-item label="原识别结果">
+          <el-input v-model="pick" disabled />
+        </el-form-item>
+        <el-form-item label="正确减字">
+          <el-input v-model="correctKey" placeholder="请输入正确的减字名称" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="correctDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitCorrect">提交反馈</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-/*
- * 单减字识别逻辑：后端优先、假数据兜底；
- * 埋点 logger.js，后端业务日志统一 mlnlog。
- */
 import { ElMessage } from 'element-plus'
-import { predictSingle } from '../api/index.js'
+import { predictSingle, submitCorrection } from '../api/index.js'
 import { logInfo, logWarn } from '../logger.js'
 
-// 弦序 / 徽位数字转中文
 const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
 const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
 
@@ -111,65 +97,49 @@ export default {
       result: null,
       pick: '',
       parse: null,
-      fromBackend: false,
-      source: '',
-      engine: 'auto',
-      recognizing: false
+      recognizing: false,
+      correctDialogVisible: false,
+      correctKey: '',
+      submitting: false,
+      currentImageUrl: ''
     }
   },
   methods: {
-    sourceLabel() {
-      if (!this.fromBackend) return '演示数据'
-      if (this.source === 'yolo') return '本地模型识别'
-      if (this.source === 'qwen') return '多模态识别'
-      return '后端识别'
-    },
     onPick(file) {
       this.rawFile = file.raw
       this.imageUrl = URL.createObjectURL(file.raw)
       this.result = null
-      this.fromBackend = false
-      this.source = ''
       logInfo('选择单减字图', file.name)
     },
-    async recognize(forceEngine) {
+    async recognize() {
       if (!this.rawFile) return
-      const engine = forceEngine || this.engine
       this.recognizing = true
       try {
-        // 优先调用后端真实接口（可手动指定引擎）
-        const res = await predictSingle(this.rawFile, engine)
+        const res = await predictSingle(this.rawFile)
         const body = res && res.data
         if (!body || !body.success || !body.data || !Array.isArray(body.data.candidates)) {
           throw new Error('后端返回结构异常')
         }
-        this.result = body.data.candidates.map(c => [c.class_key, c.confidence])
+        this.result = body.data.candidates
+        this.currentImageUrl = body.data.image_url || ''
         this.pick = body.data.top_key || this.result[0][0]
-        this.parse = this.fmtParse(body.data.parse_result, this.pick)
-        this.fromBackend = true
-        this.source = body.data.source || 'yolo'
-        logInfo('单减字识别完成（后端）', this.pick)
+        this.parse = this.fmtParse(body.data.parse_result)
+        logInfo('单减字本地识别完成', this.pick)
       } catch (e) {
-        // 后端不可用：回退内置假数据
-        logWarn('后端单字识别不可用，回退演示数据', e && e.message)
-        ElMessage.warning('后端未连接或识别异常，当前使用演示数据')
-        this.result = [
-          ['da_9_gou_4', 0.82],
-          ['san_tiao_7', 0.11],
-          ['gou_5', 0.04]
-        ]
-        this.pick = this.result[0][0]
-        this.parse = this.fakeParse(this.pick)
-        this.fromBackend = false
-        this.source = 'fake'
-        logInfo('单减字识别完成（演示）', this.pick)
+        logWarn('单字识别失败', e && e.message)
+        ElMessage.error('识别服务异常，请联系开发人员检查')
       } finally {
         this.recognizing = false
       }
     },
-    // 把后端 parse_result 归一化为模板展示结构（兼容左右手为 null、string 为数字）
-    fmtParse(p, key) {
-      if (!p) return this.fakeParse(key)
+    fmtParse(p) {
+      if (!p) {
+        return {
+          right_hand: { finger: '—', string: '—' },
+          left_hand: { finger: '—', hui: '—' },
+          meaning: '暂未收录该减字释义'
+        }
+      }
       const rh = p.right_hand || {}
       const lh = p.left_hand
       return {
@@ -183,21 +153,30 @@ export default {
         meaning: p.meaning || '暂未收录该减字释义'
       }
     },
-    fakeParse(key) {
-      return {
-        right_hand: { finger: '勾', string: '三弦' },
-        left_hand: { finger: '散音（不按弦）', hui: '—' },
-        meaning: '【演示数据】右手中指向内弹三弦，散音，无需左手按弦。'
-      }
+    openCorrectDialog() {
+      this.correctKey = this.pick
+      this.correctDialogVisible = true
     },
-    reparse(key) {
-      // 单字接口仅返回首选的解析，切换候选暂无对应释义，提示以选中项重新识别
-      this.parse = {
-        right_hand: { finger: '—', string: '—' },
-        left_hand: { finger: '—', hui: '—' },
-        meaning: '切换候选后，请以该候选重新上传识别以获取真实释义。'
+    async submitCorrect() {
+      if (!this.correctKey.trim()) {
+        ElMessage.warning('请输入正确的减字名称')
+        return
       }
-      logWarn('切换单字候选', key)
+      this.submitting = true
+      try {
+        await submitCorrection({
+          image_url: this.currentImageUrl,
+          index: 0,
+          origin_key: this.pick,
+          confirmed_key: this.correctKey.trim()
+        })
+        ElMessage.success('反馈已提交，感谢您的修正')
+        this.correctDialogVisible = false
+      } catch (e) {
+        ElMessage.error('反馈提交失败，请联系开发人员')
+      } finally {
+        this.submitting = false
+      }
     }
   }
 }
@@ -205,8 +184,6 @@ export default {
 
 <style scoped>
 .single-char { padding: 4px 0; }
-
-/* 卡片：仿书页 */
 .leaf :deep(.el-card__body) { padding: 18px 20px; }
 
 .blk {
@@ -228,21 +205,6 @@ export default {
 .src-tag { margin-left: 10px; letter-spacing: 0.05em; }
 .retry-btn { float: right; letter-spacing: 0.05em; }
 
-.engine-bar {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-}
-.engine-lbl {
-  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
-  font-size: 12.5px;
-  color: var(--ink-faint);
-  letter-spacing: 0.15em;
-}
-
-/* 上传区 */
 .up { width: 100%; }
 .drop {
   width: 100%;

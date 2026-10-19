@@ -1,39 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-智能句读接口模块（泠弦智谱 V1）
-
-输入减字 class_key 序列，返回逐字边界标签（C连续/S短停/L长停/E句末/U复核）
-与置信度。两级实现：
-    1. 优先阿里云百炼多模态（service/qwen_adapter.py，纯文本），
-       让模型依据古琴乐理综合指法、散按交替、复音与走音给出边界；
-    2. 多模态不可用（无密钥/额度耗尽/超时）时回退内置假规则
-       （每8字E、每4字S、其余C），保证页面可独立演示。
-
-modules 下的状态转移/句读规则/序列决策算法模块（V2 有标注数据集后）
-就绪后，仅替换本文件内部实现，接口与前端不动。
-
-作者：
-    @Wujee
-
-更新日期：2026-10-13
-版本：2.0.0
-
-许可证：内部使用，未经许可不得传播。
-
+智能句读接口（纯本地规则引擎，V1版，无云API）
+依据古琴传统句读规则：
+1. 复合长指法（撮/拨/轮/打圆/滚拂/多弦组合）为乐句结束点
+2. 走手音结束（带起/抓起/掐起/应合/撞）为短停顿点
+3. 散按交替切换位置为短停顿
+4. 兜底：连续4单音短停，连续8单音句末长停
+V2再基于标注数据集训练专属句读模型。
 """
-
 from fastapi import APIRouter
 from pydantic import BaseModel
-
 from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_EXCEPTION
 
 router = APIRouter()
-
-# 低于该置信度标记为 U 人工复核
 CONFIDENCE_TAU = 0.6
+# 标签置信度
+_LABEL_CONF = {
+    "C": 0.85,   # 连续
+    "S": 0.78,   # 短停
+    "L": 0.75,   # 长停
+    "E": 0.82,   # 句末
+    "U": 0.5
+}
 
-# 多模态命中间隔标签的默认置信度
-_LABEL_CONF = {"C": 0.85, "S": 0.8, "L": 0.8, "E": 0.82, "U": 0.5}
+# 句末长停顿指法（右手复合长音）
+LONG_END_FINGERS = {"cuo", "bo", "lun", "da_yuan", "li"}
+# 短停顿修饰音（走手音结束）
+SHORT_END_MODS = {"daiqi", "zhuaqi", "qia_qi", "yinghe", "zhuang", "zhu", "fu"}
 
 
 class SegmentReq(BaseModel):
@@ -42,61 +35,74 @@ class SegmentReq(BaseModel):
 
 @router.post("/segment")
 async def segment(req: SegmentReq):
-    """输入减字序列，返回逐字句读边界标签。"""
     try:
         chars = req.chars or []
         n = len(chars)
+        if n == 0:
+            return {"success": True, "data": {"count": 0, "segments": []}}
 
-        labels, source = _segment_labels(chars)
-
+        labels = _rule_segment(chars)
         results = []
         for i, key in enumerate(chars):
             label = labels[i]
             conf = _LABEL_CONF.get(label, 0.8)
-            if conf < CONFIDENCE_TAU:
-                label = "U"
             results.append({
                 "index": i,
                 "class_key": key,
                 "label": label,
                 "confidence": conf,
             })
-
-        MLN_LOG_INFO("句读分段（%s）：输入 %d 字，输出 %d 条标签",
-                     source, n, len(results))
-
+        MLN_LOG_INFO("本地规则句读完成：输入%d字，输出%d条", n, len(results))
         return {
             "success": True,
             "data": {
                 "count": n,
-                "source": source,
+                "source": "local_rule",
                 "segments": results,
             },
         }
     except Exception as e:
-        MLN_LOG_EXCEPTION("句读分段异常：%s", e)
-        return {"success": False, "data": {"msg": f"分段失败：{e}"}}
+        MLN_LOG_EXCEPTION("句读异常：%s", e)
+        return {"success": False, "data": {"msg": "句读失败，请联系开发人员检查"}}
 
 
-def _segment_labels(chars: list):
+def _rule_segment(chars: list):
     """
-    返回 (labels, source)。
-    优先多模态；失败回退假规则（每8字E、每4字S、其余C）。
+    纯规则句读：
+    输入为Stage2输出的组合key，格式：rh_string_lh_hui_base_hui_frac
     """
-    try:
-        from service import qwen_adapter
-        ok, labels = qwen_adapter.segment(chars)
-        if ok and labels:
-            return labels, "qwen"
-    except Exception as e:
-        MLN_LOG_INFO("多模态句读不可用，回退假规则：%s", e)
+    labels = []
+    last_tone = None
+    continuous_count = 0
 
-    fake = []
-    for i in range(len(chars)):
-        if (i + 1) % 8 == 0:
-            fake.append("E")
-        elif (i + 1) % 4 == 0:
-            fake.append("S")
+    for i, key in enumerate(chars):
+        parts = str(key).split("_")
+        rh = parts[0] if len(parts) > 0 else ""
+        mod = parts[-1] if len(parts) > 5 else ""
+
+        # 1. 句末长停顿：复合长指法
+        if rh in LONG_END_FINGERS:
+            labels.append("E")
+            continuous_count = 0
+            continue
+
+        # 2. 短停顿：走手结束修饰音
+        if mod in SHORT_END_MODS:
+            labels.append("S")
+            continuous_count = 0
+            continue
+
+        # 3. 兜底规则：连续计数
+        continuous_count += 1
+        if continuous_count % 8 == 0:
+            labels.append("E")
+            continuous_count = 0
+        elif continuous_count % 4 == 0:
+            labels.append("S")
         else:
-            fake.append("C")
-    return fake, "fake"
+            labels.append("C")
+
+    # 最后一个字强制句末停顿
+    if labels:
+        labels[-1] = "E"
+    return labels

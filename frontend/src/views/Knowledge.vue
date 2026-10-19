@@ -1,30 +1,14 @@
 <!-- -*- coding: utf-8 -*- -->
-<!--
-  减字库页面（泠弦智谱 V1）
-
-  左侧：类别主表（/api/knowledge/registry）—— 按拼音 key 列出全部减字；
-        顶部搜索框调用 /api/knowledge/search 做模糊匹配；
-        可按类型筛选（/api/knowledge/library?char_type=）。
-  右侧：选中减字的完整释义（优先用列表已有的完整对象；
-        如列表精简则再请求 /api/knowledge/detail/{key}）。
-
-  后端未启动时回退内置演示数据（6 条），页面顶部标签标明来源。
-
-  作者：@zlx
-  创建日期：2026-10-13
-  版本：1.0.0
--->
-
 <template>
   <div class="kb">
     <el-row :gutter="16">
-      <!-- 左：检索 + 列表 -->
+      <!-- 左：列表 -->
       <el-col :xs="24" :sm="10">
         <el-card shadow="never" class="leaf">
           <div class="blk"><span class="blk-orn">○</span> 检 索</div>
 
           <div class="search-row">
-            <el-input v-model="q" placeholder="输入指法 / 弦 / 徽位 / 拼音 key"
+            <el-input v-model="q" placeholder="输入指法/弦/徽位/中文名称"
                       clearable @keyup.enter="doSearch" />
             <el-button type="primary" plain @click="doSearch">搜 索</el-button>
           </div>
@@ -44,16 +28,13 @@
           <div class="blk2">
             <span v-if="loading">载入中…</span>
             <span v-else>共 {{ list.length }} 条</span>
-            <el-tag size="small" :type="fromBackend ? 'success' : 'warning'" class="src-tag">
-              {{ fromBackend ? '后端知识库' : '演示数据' }}
-            </el-tag>
+            <el-tag size="small" type="success" class="src-tag">本地知识库</el-tag>
           </div>
 
           <ul class="kb-list">
             <li v-for="item in list" :key="item.char_key"
                 :class="{ active: cur && cur.char_key === item.char_key }"
-                @click="selectItem(item)">
-              <span class="kb-key">{{ item.char_key }}</span>
+                @click="cur = item">
               <span class="kb-cn">{{ item.display }}</span>
               <span class="kb-type">{{ item.type }}</span>
             </li>
@@ -76,20 +57,19 @@
               <span class="p-display">{{ cur.display }}</span>
               <el-tag size="small" type="info">{{ cur.type }}</el-tag>
             </div>
-            <div class="p-key">拼音 key：{{ cur.char_key }}</div>
 
             <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
             <div class="parse">
               <div class="parse-row">
-                <span class="k">右 手</span>{{ fmtRh(cur.right_hand) }}
+                <span class="k">右 手</span>{{ cur.right_hand_text }}
               </div>
               <div class="parse-row">
-                <span class="k">左 手</span>{{ fmtLh(cur.left_hand) }}
+                <span class="k">左 手</span>{{ cur.left_hand_text }}
               </div>
-              <div class="meaning">{{ cur.meaning || '暂未收录该减字释义' }}</div>
+              <div class="meaning">{{ cur.desc }}</div>
             </div>
 
-            <div class="blk"><span class="blk-orn">○</span> 标 记</div>
+            <div class="blk"><span class="blk-orn">○</span> 音 色</div>
             <div class="flags">
               <span class="flag" :class="{ on: cur.is_san }">散音</span>
               <span class="flag" :class="{ on: cur.is_fan }">泛音</span>
@@ -103,37 +83,8 @@
 </template>
 
 <script>
-import { getKbList, getKbItem, searchKb } from '../api/index.js'
-import { logInfo, logWarn } from '../logger.js'
-
-const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
-const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
-
-// 演示兜底数据（后端未启动时用）
-const FALLBACK = [
-  { char_key: 'san_tiao_7', display: '散挑七', type: '散音', left_hand: null,
-    right_hand: { finger: '挑', finger_name: '食指', string: 7 }, is_san: true, is_fan: false,
-    meaning: '右手食指向外挑七弦空弦，散音，左手不按弦。' },
-  { char_key: 'gou_5', display: '勾五', type: '散音', left_hand: null,
-    right_hand: { finger: '勾', finger_name: '中指', string: 5 }, is_san: true, is_fan: false,
-    meaning: '右手中指向内勾五弦空弦，散音，左手不按弦。' },
-  { char_key: 'da_9_gou_4', display: '大九勾四', type: '按音',
-    left_hand: { finger: '大指', string: 4, hui: 9 },
-    right_hand: { finger: '勾', finger_name: '中指', string: 4 }, is_san: false, is_fan: false,
-    meaning: '左手大指按四弦九徽，右手中指向内勾四弦，得按音。' },
-  { char_key: 'ming_10_gou_5', display: '名十勾五', type: '按音',
-    left_hand: { finger: '名指', string: 5, hui: 10 },
-    right_hand: { finger: '勾', finger_name: '中指', string: 5 }, is_san: false, is_fan: false,
-    meaning: '左手无名指按五弦十徽，右手中指向内勾五弦，得按音。' },
-  { char_key: 'zhuang', display: '撞', type: '装饰音',
-    left_hand: { finger: '随前音', string: null, hui: null },
-    right_hand: null, is_san: false, is_fan: false,
-    meaning: '左手按弦得音后，快速向上移动少许再回原位，产生装饰性顿挫。' },
-  { char_key: 'cuo_ming_10_gou_4_san_tiao_6', display: '名十勾四＋散挑六（撮）', type: '复合音',
-    left_hand: { finger: '名指', string: 4, hui: 10 },
-    right_hand: { finger: '撮', finger_name: '中指+食指', string: '4+6' }, is_san: false, is_fan: false,
-    meaning: '撮音：右手中指勾四弦（左手名指按十徽）与食指挑六弦散音同时发声。' }
-]
+import { ElMessage } from 'element-plus'
+import { getKbList, searchKb } from '../api/index.js'
 
 export default {
   name: 'Knowledge',
@@ -143,8 +94,7 @@ export default {
       charType: '',
       loading: false,
       list: [],
-      cur: null,
-      fromBackend: false
+      cur: null
     }
   },
   mounted() {
@@ -157,24 +107,16 @@ export default {
         const res = await getKbList(this.charType || undefined)
         const body = res && res.data
         const dict = (body && body.success && body.data) || {}
-        const arr = Object.values(dict)
-        if (!arr.length && !this.charType) throw new Error('空知识库')
-        this.list = arr
-        this.cur = arr[0] || null
-        this.fromBackend = true
-        logInfo('知识库加载完成', `共 ${arr.length} 条`)
+        this.list = Object.values(dict)
+        this.cur = this.list[0] || null
       } catch (e) {
-        logWarn('知识库接口不可用，回退演示数据', e && e.message)
-        let arr = FALLBACK.slice()
-        if (this.charType) arr = arr.filter(x => x.type === this.charType)
-        this.list = arr
-        this.cur = arr[0] || null
-        this.fromBackend = false
+        ElMessage.error('知识库加载失败，请联系开发人员检查')
+        this.list = []
+        this.cur = null
       } finally {
         this.loading = false
       }
     },
-
     async doSearch() {
       const q = (this.q || '').trim()
       if (!q) return this.loadList()
@@ -183,53 +125,13 @@ export default {
         const res = await searchKb(q)
         const body = res && res.data
         const dict = (body && body.success && body.data) || {}
-        const arr = Object.values(dict)
-        this.list = arr
-        this.cur = arr[0] || null
-        this.fromBackend = true
-        logInfo('知识库搜索', `q=${q} → ${arr.length} 条`)
+        this.list = Object.values(dict)
+        this.cur = this.list[0] || null
       } catch (e) {
-        logWarn('搜索接口不可用，本地过滤', e && e.message)
-        const k = q.toLowerCase()
-        const arr = FALLBACK.filter(x =>
-          (x.char_key + ' ' + x.display + ' ' + (x.meaning || '')).toLowerCase().includes(k)
-        )
-        this.list = arr
-        this.cur = arr[0] || null
-        this.fromBackend = false
+        ElMessage.error('搜索失败，请联系开发人员检查')
       } finally {
         this.loading = false
       }
-    },
-
-    async selectItem(item) {
-      if (item.meaning || item.right_hand !== undefined) {
-        this.cur = item
-        return
-      }
-      try {
-        const res = await getKbItem(item.char_key)
-        const body = res && res.data
-        this.cur = (body && body.success && body.data) ? body.data : item
-      } catch (e) {
-        logWarn('detail 接口不可用，展示列表项', e && e.message)
-        this.cur = item
-      }
-    },
-
-    fmtRh(rh) {
-      if (!rh) return '—'
-      const f = rh.finger || rh.finger_name || '—'
-      const s = rh.string != null
-        ? (typeof rh.string === 'number' ? (XIAN[rh.string] || rh.string) + '弦' : rh.string)
-        : '—'
-      return `${f} · ${s}`
-    },
-    fmtLh(lh) {
-      if (!lh) return '散音（不按弦）'
-      const f = lh.finger || '—'
-      const h = lh.hui != null ? (HUI_MAP[lh.hui] || lh.hui) + '徽' : '—'
-      return `${f} · ${h}`
     }
   }
 }
@@ -308,12 +210,6 @@ export default {
   border-left: 3px solid var(--zheshi);
   padding-left: 6px;
 }
-.kb-key {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: var(--zheshi-deep);
-  min-width: 130px;
-}
 .kb-cn {
   font-family: 'STKaiti', 'KaiTi', '楷体', serif;
   font-size: 14px;
@@ -354,12 +250,6 @@ export default {
   font-size: 30px;
   color: var(--ink);
   letter-spacing: 0.18em;
-}
-.p-key {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: var(--ink-faint);
-  margin-top: 6px;
 }
 
 .parse {
