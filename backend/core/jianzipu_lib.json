@@ -1,27 +1,2966 @@
 {
-  "san_tiao_7": {"char_key":"san_tiao_7","display":"散挑七","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":7},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑七弦空弦，散音，左手不按弦。"},
-  "gou_5": {"char_key":"gou_5","display":"勾五","type":"散音","left_hand":null,"right_hand":{"finger":"勾","finger_name":"中指","string":5},"is_san":true,"is_fan":false,"meaning":"右手中指向内勾五弦空弦，散音，左手不按弦。"},
-  "tiao_7": {"char_key":"tiao_7","display":"挑七","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":7},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑七弦空弦，散音，左手不按弦。"},
-  "ming_10_gou_5": {"char_key":"ming_10_gou_5","display":"名十勾五","type":"按音","left_hand":{"finger":"名指","string":5,"hui":10},"right_hand":{"finger":"勾","finger_name":"中指","string":5},"is_san":false,"is_fan":false,"meaning":"左手无名指按五弦十徽，右手中指向内勾五弦，得按音。"},
-  "tiao_6": {"char_key":"tiao_6","display":"挑六","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":6},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑六弦空弦，散音，左手不按弦。"},
-  "ming_10_gou_4": {"char_key":"ming_10_gou_4","display":"名十勾四","type":"按音","left_hand":{"finger":"名指","string":4,"hui":10},"right_hand":{"finger":"勾","finger_name":"中指","string":4},"is_san":false,"is_fan":false,"meaning":"左手无名指按四弦十徽，右手中指向内勾四弦，得按音。"},
-  "da_9_gou_4": {"char_key":"da_9_gou_4","display":"大九勾四","type":"按音","left_hand":{"finger":"大指","string":4,"hui":9},"right_hand":{"finger":"勾","finger_name":"中指","string":4},"is_san":false,"is_fan":false,"meaning":"左手大指按四弦九徽，右手中指向内勾四弦，得按音。"},
-  "san_tiao_6": {"char_key":"san_tiao_6","display":"散挑六","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":6},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑六弦空弦，散音，左手不按弦。"},
-  "gou_4": {"char_key":"gou_4","display":"勾四","type":"散音","left_hand":null,"right_hand":{"finger":"勾","finger_name":"中指","string":4},"is_san":true,"is_fan":false,"meaning":"右手中指向内勾四弦空弦，散音，左手不按弦。"},
-  "tiao_5": {"char_key":"tiao_5","display":"挑五","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":5},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑五弦空弦，散音，左手不按弦。"},
-  "ming_11_gou_3": {"char_key":"ming_11_gou_3","display":"名十一勾三","type":"按音","left_hand":{"finger":"名指","string":3,"hui":11},"right_hand":{"finger":"勾","finger_name":"中指","string":3},"is_san":false,"is_fan":false,"meaning":"左手无名指按三弦十一徽，右手中指向内勾三弦，得按音。"},
-  "da_9_gou_3": {"char_key":"da_9_gou_3","display":"大九勾三","type":"按音","left_hand":{"finger":"大指","string":3,"hui":9},"right_hand":{"finger":"勾","finger_name":"中指","string":3},"is_san":false,"is_fan":false,"meaning":"左手大指按三弦九徽，右手中指向内勾三弦，得按音。"},
-  "san_tiao_5": {"char_key":"san_tiao_5","display":"散挑五","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":5},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑五弦空弦，散音，左手不按弦。"},
-  "gou_3": {"char_key":"gou_3","display":"勾三","type":"散音","left_hand":null,"right_hand":{"finger":"勾","finger_name":"中指","string":3},"is_san":true,"is_fan":false,"meaning":"右手中指向内勾三弦空弦，散音，左手不按弦。"},
-  "tiao_4": {"char_key":"tiao_4","display":"挑四","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":4},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑四弦空弦，散音，左手不按弦。"},
-  "ming_10_gou_2": {"char_key":"ming_10_gou_2","display":"名十勾二","type":"按音","left_hand":{"finger":"名指","string":2,"hui":10},"right_hand":{"finger":"勾","finger_name":"中指","string":2},"is_san":false,"is_fan":false,"meaning":"左手无名指按二弦十徽，右手中指向内勾二弦，得按音。"},
-  "da_9_gou_2": {"char_key":"da_9_gou_2","display":"大九勾二","type":"按音","left_hand":{"finger":"大指","string":2,"hui":9},"right_hand":{"finger":"勾","finger_name":"中指","string":2},"is_san":false,"is_fan":false,"meaning":"左手大指按二弦九徽，右手中指向内勾二弦，得按音。"},
-  "san_tiao_4": {"char_key":"san_tiao_4","display":"散挑四","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":4},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑四弦空弦，散音，左手不按弦。"},
-  "gou_2": {"char_key":"gou_2","display":"勾二","type":"散音","left_hand":null,"right_hand":{"finger":"勾","finger_name":"中指","string":2},"is_san":true,"is_fan":false,"meaning":"右手中指向内勾二弦空弦，散音，左手不按弦。"},
-  "tiao_3": {"char_key":"tiao_3","display":"挑三","type":"散音","left_hand":null,"right_hand":{"finger":"挑","finger_name":"食指","string":3},"is_san":true,"is_fan":false,"meaning":"右手食指向外挑三弦空弦，散音，左手不按弦。"},
-  "zhong_10_gou_1": {"char_key":"zhong_10_gou_1","display":"中十勾一","type":"按音","left_hand":{"finger":"中指","string":1,"hui":10},"right_hand":{"finger":"勾","finger_name":"中指","string":1},"is_san":false,"is_fan":false,"meaning":"左手中指按一弦十徽，右手中指向内勾一弦，得按音。"},
-  "da_9_gou_1": {"char_key":"da_9_gou_1","display":"大九勾一","type":"按音","left_hand":{"finger":"大指","string":1,"hui":9},"right_hand":{"finger":"勾","finger_name":"中指","string":1},"is_san":false,"is_fan":false,"meaning":"左手大指按一弦九徽，右手中指向内勾一弦，得按音。"},
-  "zhuang": {"char_key":"zhuang","display":"撞","type":"装饰音","left_hand":{"finger":"随前音","string":null,"hui":null},"right_hand":null,"is_san":false,"is_fan":false,"meaning":"左手按弦得音后，快速向上移动少许再回原位，产生装饰性顿挫；不单独弹弦，作用于前一个按音。"},
-  "ming_10_tiao_4": {"char_key":"ming_10_tiao_4","display":"名十挑四","type":"按音","left_hand":{"finger":"名指","string":4,"hui":10},"right_hand":{"finger":"挑","finger_name":"食指","string":4},"is_san":false,"is_fan":false,"meaning":"左手无名指按四弦十徽，右手食指向外挑四弦，得按音。"},
-  "cuo_ming_10_gou_4_san_tiao_6": {"char_key":"cuo_ming_10_gou_4_san_tiao_6","display":"名十勾四＋散挑六（撮）","type":"复合音","left_hand":{"finger":"名指","string":4,"hui":10},"right_hand":{"finger":"撮","finger_name":"中指+食指","string":"4+6"},"is_san":false,"is_fan":false,"meaning":"撮音：右手中指勾四弦（左手名指按十徽）与食指挑六弦散音同时发声，两弦同声。"}
+    "da_7_mo_6":  {
+                      "char_key":  "da_7_mo_6",
+                      "display":  "大七徽抹六弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  6,
+                                        "hui":  7
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  6
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "da_7_gou_6":  {
+                       "char_key":  "da_7_gou_6",
+                       "display":  "大七徽勾六弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  6,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  6
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "fan_7_tiao_7":  {
+                         "char_key":  "fan_7_tiao_7",
+                         "display":  "泛7挑7",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  7,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  7
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_7_tiao_6":  {
+                        "char_key":  "da_7_tiao_6",
+                        "display":  "大七徽挑六弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  6,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "li_4_3":  {
+                   "char_key":  "li_4_3",
+                   "display":  "历双/多弦4+3序列:tiao@4+tiao@3",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "历",
+                                      "finger_name":  "食指",
+                                      "string":  "4+3"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "gou_7":  {
+                  "char_key":  "gou_7",
+                  "display":  "勾七弦",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  7
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指勾，散音，左手不按弦。"
+              },
+    "da_6_2_tuo_7":  {
+                         "char_key":  "da_6_2_tuo_7",
+                         "display":  "大六徽二分托七弦",
+                         "type":  "按音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  7,
+                                           "hui":  6
+                                       },
+                         "right_hand":  {
+                                            "finger":  "托",
+                                            "finger_name":  "拇指",
+                                            "string":  7
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "左手，右手，得按音。"
+                     },
+    "da_9_tiao_6":  {
+                        "char_key":  "da_9_tiao_6",
+                        "display":  "大九徽挑六弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  6,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "ming_11_gou_3":  {
+                          "char_key":  "ming_11_gou_3",
+                          "display":  "名十一勾三",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "名指",
+                                            "string":  3,
+                                            "hui":  11
+                                        },
+                          "right_hand":  {
+                                             "finger":  "勾",
+                                             "finger_name":  "中指",
+                                             "string":  3
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手无名指按三弦十一徽，右手中指向内勾三弦，得按音。"
+                      },
+    "da_9_tiao_4":  {
+                        "char_key":  "da_9_tiao_4",
+                        "display":  "大九徽挑四弦〔注〕",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "4",
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  "4"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "zhong_10_gou_1":  {
+                           "char_key":  "zhong_10_gou_1",
+                           "display":  "中十勾一",
+                           "type":  "按音",
+                           "left_hand":  {
+                                             "finger":  "中指",
+                                             "string":  1,
+                                             "hui":  10
+                                         },
+                           "right_hand":  {
+                                              "finger":  "勾",
+                                              "finger_name":  "中指",
+                                              "string":  1
+                                          },
+                           "is_san":  false,
+                           "is_fan":  false,
+                           "meaning":  "左手中指按一弦十徽，右手中指向内勾一弦，得按音。"
+                       },
+    "da_8_mo_5":  {
+                      "char_key":  "da_8_mo_5",
+                      "display":  "大八徽抹五弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  5,
+                                        "hui":  8
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  5
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "li_7_6":  {
+                   "char_key":  "li_7_6",
+                   "display":  "名十徽历双/多弦7+6序列:tiao@7+tiao@6",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "历",
+                                      "finger_name":  "食指",
+                                      "string":  "7+6"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "tiao_7_6":  {
+                     "char_key":  "tiao_7_6",
+                     "display":  "挑双/多弦7+6〔jiu〕序列:tiao@7+tiao@6",
+                     "type":  "复合音",
+                     "left_hand":  null,
+                     "right_hand":  {
+                                        "finger":  "挑",
+                                        "finger_name":  "食指",
+                                        "string":  "7+6"
+                                    },
+                     "is_san":  false,
+                     "is_fan":  false,
+                     "meaning":  "复合指法：右手，多弦配合发声。"
+                 },
+    "da_9_tiao_1":  {
+                        "char_key":  "da_9_tiao_1",
+                        "display":  "大九徽挑一弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  1,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  1
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "cuo_2_4":  {
+                    "char_key":  "cuo_2_4",
+                    "display":  "名撮双/多弦2+4",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "2+4"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "da_9_mo_7":  {
+                      "char_key":  "da_9_mo_7",
+                      "display":  "大九徽抹七弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  7,
+                                        "hui":  9
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  7
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "fan_10_tiao_5":  {
+                          "char_key":  "fan_10_tiao_5",
+                          "display":  "泛10挑5",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  5,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  5
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "gou_5":  {
+                  "char_key":  "gou_5",
+                  "display":  "勾五",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  5
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指向内勾五弦空弦，散音，左手不按弦。"
+              },
+    "cuo_4_7_da_9":  {
+                         "char_key":  "cuo_4_7_da_9",
+                         "display":  "大九徽撮双/多弦4+7",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "4+7",
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "4+7"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "mo_4":  {
+                 "char_key":  "mo_4",
+                 "display":  "抹四弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "抹",
+                                    "finger_name":  "食指",
+                                    "string":  4
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手食指抹，散音，左手不按弦。"
+             },
+    "ming_10_gou_2":  {
+                          "char_key":  "ming_10_gou_2",
+                          "display":  "名十勾二",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "名指",
+                                            "string":  2,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "勾",
+                                             "finger_name":  "中指",
+                                             "string":  2
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手无名指按二弦十徽，右手中指向内勾二弦，得按音。"
+                      },
+    "qia_qi":  {
+                   "char_key":  "qia_qi",
+                   "display":  "名七徽七分〔qia_qi〕",
+                   "type":  "装饰音",
+                   "left_hand":  {
+                                     "finger":  "随前音",
+                                     "string":  null,
+                                     "hui":  null
+                                 },
+                   "right_hand":  null,
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "古琴左手装饰技法：掐起，属于走手音修饰，作用于前序按音，不单独弹弦。"
+               },
+    "da_7_mo_7":  {
+                      "char_key":  "da_7_mo_7",
+                      "display":  "大七徽抹七弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  7,
+                                        "hui":  7
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  7
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "tiao_1_2":  {
+                     "char_key":  "tiao_1_2",
+                     "display":  "中十徽挑双/多弦1+2序列:tiao@1+tiao@2",
+                     "type":  "复合音",
+                     "left_hand":  null,
+                     "right_hand":  {
+                                        "finger":  "挑",
+                                        "finger_name":  "食指",
+                                        "string":  "1+2"
+                                    },
+                     "is_san":  false,
+                     "is_fan":  false,
+                     "meaning":  "复合指法：右手，多弦配合发声。"
+                 },
+    "ti_6_5_da_7":  {
+                        "char_key":  "ti_6_5_da_7",
+                        "display":  "大七徽九分剔双/多弦6+5〔注〕序列:ti@6+ti@5",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "6+5",
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "剔",
+                                           "finger_name":  "中指",
+                                           "string":  "6+5"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "_6_7_da_9":  {
+                      "char_key":  "_6_7_da_9",
+                      "display":  "大九徽ci双/多弦6+7序列:ci@6+ci@7",
+                      "type":  "复合音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  "6+7",
+                                        "hui":  9
+                                    },
+                      "right_hand":  {
+                                         "finger":  null,
+                                         "finger_name":  null,
+                                         "string":  "6+7"
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                  },
+    "da_7_gou_2":  {
+                       "char_key":  "da_7_gou_2",
+                       "display":  "大七徽勾二弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  2,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  2
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "fan_7_gou_2":  {
+                        "char_key":  "fan_7_gou_2",
+                        "display":  "泛7勾2",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  2,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  2
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "da_8_5_gou_5":  {
+                         "char_key":  "da_8_5_gou_5",
+                         "display":  "大八徽五分勾五弦",
+                         "type":  "按音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  5,
+                                           "hui":  8
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  5
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "左手，右手，得按音。"
+                     },
+    "cuo_6_1":  {
+                    "char_key":  "cuo_6_1",
+                    "display":  "da+zhong七徽撮双/多弦6+1",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "6+1"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "da_8_3_tiao_5":  {
+                          "char_key":  "da_8_3_tiao_5",
+                          "display":  "大八徽三分挑五弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  5,
+                                            "hui":  8
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  5
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "fan_9_gou_2":  {
+                        "char_key":  "fan_9_gou_2",
+                        "display":  "泛9勾2",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  2,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  2
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_10_tiao_3":  {
+                          "char_key":  "fan_10_tiao_3",
+                          "display":  "泛10挑3",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  3,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  3
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "cuo_5_3":  {
+                    "char_key":  "cuo_5_3",
+                    "display":  "中撮双/多弦5+3",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "5+3"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "da_6_tuo_7":  {
+                       "char_key":  "da_6_tuo_7",
+                       "display":  "大六徽二分托七弦",
+                       "type":  "复合音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  "7",
+                                         "hui":  6
+                                     },
+                       "right_hand":  {
+                                          "finger":  "托",
+                                          "finger_name":  "拇指",
+                                          "string":  "7"
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                   },
+    "cuo_7_5":  {
+                    "char_key":  "cuo_7_5",
+                    "display":  "名九徽撮双/多弦7+5",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "7+5"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "lun_7":  {
+                  "char_key":  "lun_7",
+                  "display":  "轮七弦序列:zhai@7+ti@7+tiao@7",
+                  "type":  "复合音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "轮",
+                                     "finger_name":  "名指+中指+食指",
+                                     "string":  "7"
+                                 },
+                  "is_san":  false,
+                  "is_fan":  false,
+                  "meaning":  "复合指法：右手，多弦配合发声。"
+              },
+    "cuo_5_3_da_8":  {
+                         "char_key":  "cuo_5_3_da_8",
+                         "display":  "大八徽撮双/多弦5+3",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "5+3",
+                                           "hui":  8
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "5+3"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "cuo_7_3_da_6":  {
+                         "char_key":  "cuo_7_3_da_6",
+                         "display":  "大六徽二分撮双/多弦7+3",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "7+3",
+                                           "hui":  6
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "7+3"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "cuo_1_2":  {
+                    "char_key":  "cuo_1_2",
+                    "display":  "中撮双/多弦1+2",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "1+2"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "cuo_6_3":  {
+                    "char_key":  "cuo_6_3",
+                    "display":  "名十徽撮双/多弦6+3",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "6+3"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "cuo_7_2_da_7":  {
+                         "char_key":  "cuo_7_2_da_7",
+                         "display":  "大七徽撮双/多弦7+2",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "7+2",
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "7+2"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fan_10_gou_7":  {
+                         "char_key":  "fan_10_gou_7",
+                         "display":  "泛10勾7",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  7,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  7
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "gou_6":  {
+                  "char_key":  "gou_6",
+                  "display":  "勾六弦",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  6
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指勾，散音，左手不按弦。"
+              },
+    "san_tiao_4":  {
+                       "char_key":  "san_tiao_4",
+                       "display":  "散挑四",
+                       "type":  "散音",
+                       "left_hand":  null,
+                       "right_hand":  {
+                                          "finger":  "挑",
+                                          "finger_name":  "食指",
+                                          "string":  4
+                                      },
+                       "is_san":  true,
+                       "is_fan":  false,
+                       "meaning":  "右手食指向外挑四弦空弦，散音，左手不按弦。"
+                   },
+    "da_9_tiao_5":  {
+                        "char_key":  "da_9_tiao_5",
+                        "display":  "大九徽挑五弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  5,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  5
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "cuo_3_5":  {
+                    "char_key":  "cuo_3_5",
+                    "display":  "名十徽撮双/多弦3+5",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "3+5"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "da_1":  {
+                 "char_key":  "da_1",
+                 "display":  "中六徽四分大一弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "打",
+                                    "finger_name":  "无名指",
+                                    "string":  1
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手无名指打，散音，左手不按弦。"
+             },
+    "ming_10_gou_5":  {
+                          "char_key":  "ming_10_gou_5",
+                          "display":  "名十勾五",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "名指",
+                                            "string":  5,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "勾",
+                                             "finger_name":  "中指",
+                                             "string":  5
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手无名指按五弦十徽，右手中指向内勾五弦，得按音。"
+                      },
+    "gou_4":  {
+                  "char_key":  "gou_4",
+                  "display":  "勾四",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  4
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指向内勾四弦空弦，散音，左手不按弦。"
+              },
+    "da_9_gou_6":  {
+                       "char_key":  "da_9_gou_6",
+                       "display":  "大九徽勾六弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  6,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  6
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "cuo_6_1_da_7":  {
+                         "char_key":  "cuo_6_1_da_7",
+                         "display":  "大七徽撮双/多弦6+1",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "6+1",
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "6+1"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fan_10_tiao_7":  {
+                          "char_key":  "fan_10_tiao_7",
+                          "display":  "泛10挑7",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  7,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  7
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "ti_1_2":  {
+                   "char_key":  "ti_1_2",
+                   "display":  "中十徽剔双/多弦1+2序列:ti@1+ti@2",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "剔",
+                                      "finger_name":  "中指",
+                                      "string":  "1+2"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "da_7_gou_3":  {
+                       "char_key":  "da_7_gou_3",
+                       "display":  "大七徽勾三弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  3,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  3
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "da_9_gou_2":  {
+                       "char_key":  "da_9_gou_2",
+                       "display":  "大九勾二",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  2,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  2
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手大指按二弦九徽，右手中指向内勾二弦，得按音。"
+                   },
+    "cuo_1_3":  {
+                    "char_key":  "cuo_1_3",
+                    "display":  "中撮双/多弦1+3",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "1+3"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "fan_7_tiao_4":  {
+                         "char_key":  "fan_7_tiao_4",
+                         "display":  "泛7挑4",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  4,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  4
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "fan_10_gou_2":  {
+                         "char_key":  "fan_10_gou_2",
+                         "display":  "泛10勾2",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  2,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  2
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "cuo_5_2":  {
+                    "char_key":  "cuo_5_2",
+                    "display":  "da+zhong七徽撮双/多弦5+2",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "5+2"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "ti_4_3_da_7":  {
+                        "char_key":  "ti_4_3_da_7",
+                        "display":  "大七徽六分剔双/多弦4+3序列:ti@4+ti@3",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "4+3",
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "剔",
+                                           "finger_name":  "中指",
+                                           "string":  "4+3"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "san_tiao_5":  {
+                       "char_key":  "san_tiao_5",
+                       "display":  "散挑五",
+                       "type":  "散音",
+                       "left_hand":  null,
+                       "right_hand":  {
+                                          "finger":  "挑",
+                                          "finger_name":  "食指",
+                                          "string":  5
+                                      },
+                       "is_san":  true,
+                       "is_fan":  false,
+                       "meaning":  "右手食指向外挑五弦空弦，散音，左手不按弦。"
+                   },
+    "da_5_tiao_7":  {
+                        "char_key":  "da_5_tiao_7",
+                        "display":  "大五徽挑七弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  7,
+                                          "hui":  5
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "da_9_tiao_3":  {
+                        "char_key":  "da_9_tiao_3",
+                        "display":  "大九徽挑三弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  3,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  3
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "cuo_7_2":  {
+                    "char_key":  "cuo_7_2",
+                    "display":  "da+zhong七徽撮双/多弦7+2",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "7+2"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "da_9_da_4":  {
+                      "char_key":  "da_9_da_4",
+                      "display":  "大九徽大四弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  4,
+                                        "hui":  9
+                                    },
+                      "right_hand":  {
+                                         "finger":  "打",
+                                         "finger_name":  "无名指",
+                                         "string":  4
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "ti_4_3":  {
+                   "char_key":  "ti_4_3",
+                   "display":  "名十徽剔双/多弦4+3序列:ti@4+ti@3",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "剔",
+                                      "finger_name":  "中指",
+                                      "string":  "4+3"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "da_7_tiao_5":  {
+                        "char_key":  "da_7_tiao_5",
+                        "display":  "大七徽挑五弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  5,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  5
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "fan_9_tiao_3":  {
+                         "char_key":  "fan_9_tiao_3",
+                         "display":  "泛9挑3",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  3,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  3
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "ti_5":  {
+                 "char_key":  "ti_5",
+                 "display":  "剔五弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "剔",
+                                    "finger_name":  "中指",
+                                    "string":  5
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手中指剔，散音，左手不按弦。"
+             },
+    "fan_10_gou_1":  {
+                         "char_key":  "fan_10_gou_1",
+                         "display":  "泛10勾1",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  1,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  1
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_5_da_3":  {
+                      "char_key":  "da_5_da_3",
+                      "display":  "大五徽大三弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  3,
+                                        "hui":  5
+                                    },
+                      "right_hand":  {
+                                         "finger":  "打",
+                                         "finger_name":  "无名指",
+                                         "string":  3
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "ming_10_gou_4":  {
+                          "char_key":  "ming_10_gou_4",
+                          "display":  "名十勾四",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "名指",
+                                            "string":  4,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "勾",
+                                             "finger_name":  "中指",
+                                             "string":  4
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手无名指按四弦十徽，右手中指向内勾四弦，得按音。"
+                      },
+    "fan_9_tiao_5":  {
+                         "char_key":  "fan_9_tiao_5",
+                         "display":  "泛9挑5",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  5,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  5
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "san_tiao_7":  {
+                       "char_key":  "san_tiao_7",
+                       "display":  "散挑七",
+                       "type":  "散音",
+                       "left_hand":  null,
+                       "right_hand":  {
+                                          "finger":  "挑",
+                                          "finger_name":  "食指",
+                                          "string":  7
+                                      },
+                       "is_san":  true,
+                       "is_fan":  false,
+                       "meaning":  "右手食指向外挑七弦空弦，散音，左手不按弦。"
+                   },
+    "li_7_6_da_9":  {
+                        "char_key":  "li_7_6_da_9",
+                        "display":  "大九徽历双/多弦7+6序列:tiao@7+tiao@6",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "7+6",
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "历",
+                                           "finger_name":  "食指",
+                                           "string":  "7+6"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "li_5_4":  {
+                   "char_key":  "li_5_4",
+                   "display":  "历双/多弦5+4序列:tiao@5+tiao@4",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "历",
+                                      "finger_name":  "食指",
+                                      "string":  "5+4"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "zhuang":  {
+                   "char_key":  "zhuang",
+                   "display":  "撞",
+                   "type":  "装饰音",
+                   "left_hand":  {
+                                     "finger":  "随前音",
+                                     "string":  null,
+                                     "hui":  null
+                                 },
+                   "right_hand":  null,
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "左手按弦得音后，快速向上移动少许再回原位，产生装饰性顿挫；不单独弹弦，作用于前一个按音。"
+               },
+    "da_5_mo_6":  {
+                      "char_key":  "da_5_mo_6",
+                      "display":  "大五徽抹六弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  6,
+                                        "hui":  5
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  6
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "fan_7_gou_6":  {
+                        "char_key":  "fan_7_gou_6",
+                        "display":  "泛7勾6",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  6,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "da_7_tiao_7":  {
+                        "char_key":  "da_7_tiao_7",
+                        "display":  "大七徽挑七弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  7,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "fan_9_tiao_1":  {
+                         "char_key":  "fan_9_tiao_1",
+                         "display":  "泛9挑1",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  1,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  1
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_9_mo_5":  {
+                      "char_key":  "da_9_mo_5",
+                      "display":  "大九徽抹五弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  5,
+                                        "hui":  9
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  5
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "fan_7_tiao_1":  {
+                         "char_key":  "fan_7_tiao_1",
+                         "display":  "泛7挑1",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  1,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  1
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "mo_6":  {
+                 "char_key":  "mo_6",
+                 "display":  "抹六弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "抹",
+                                    "finger_name":  "食指",
+                                    "string":  6
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手食指抹，散音，左手不按弦。"
+             },
+    "da_6_4_tiao_6":  {
+                          "char_key":  "da_6_4_tiao_6",
+                          "display":  "大六徽四分挑六弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  6,
+                                            "hui":  6
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  6
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "fan_9_tiao_7":  {
+                         "char_key":  "fan_9_tiao_7",
+                         "display":  "泛9挑7",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  7,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  7
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "cuo_6_3_da_5":  {
+                         "char_key":  "cuo_6_3_da_5",
+                         "display":  "大五徽撮双/多弦6+3",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "6+3",
+                                           "hui":  5
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "6+3"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "da_6_lun_7":  {
+                       "char_key":  "da_6_lun_7",
+                       "display":  "大六徽二分轮七弦序列:ming@7+zhong@7+shi@7",
+                       "type":  "复合音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  "7",
+                                         "hui":  6
+                                     },
+                       "right_hand":  {
+                                          "finger":  "轮",
+                                          "finger_name":  "名指+中指+食指",
+                                          "string":  "7"
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                   },
+    "xia":  {
+                "char_key":  "xia",
+                "display":  "七徽〔下〕",
+                "type":  "装饰音",
+                "left_hand":  {
+                                  "finger":  "随前音",
+                                  "string":  null,
+                                  "hui":  null
+                              },
+                "right_hand":  null,
+                "is_san":  false,
+                "is_fan":  false,
+                "meaning":  "古琴左手装饰技法：下，属于走手音修饰，作用于前序按音，不单独弹弦。"
+            },
+    "da_9_gou_3":  {
+                       "char_key":  "da_9_gou_3",
+                       "display":  "大九勾三",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  3,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  3
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手大指按三弦九徽，右手中指向内勾三弦，得按音。"
+                   },
+    "taoqi":  {
+                  "char_key":  "taoqi",
+                  "display":  "ming+da〔滔起〕",
+                  "type":  "装饰音",
+                  "left_hand":  {
+                                    "finger":  "随前音",
+                                    "string":  null,
+                                    "hui":  null
+                                },
+                  "right_hand":  null,
+                  "is_san":  false,
+                  "is_fan":  false,
+                  "meaning":  "古琴左手装饰技法：滔起，属于走手音修饰，作用于前序按音，不单独弹弦。"
+              },
+    "fan_10_tiao_1":  {
+                          "char_key":  "fan_10_tiao_1",
+                          "display":  "泛10挑1",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  1,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  1
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "da_9_da_3":  {
+                      "char_key":  "da_9_da_3",
+                      "display":  "大九徽大三弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  3,
+                                        "hui":  9
+                                    },
+                      "right_hand":  {
+                                         "finger":  "打",
+                                         "finger_name":  "无名指",
+                                         "string":  3
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "da_9_gou_5":  {
+                       "char_key":  "da_9_gou_5",
+                       "display":  "大九徽勾五弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  5,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  5
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "bo_6_7_da_7":  {
+                        "char_key":  "bo_6_7_da_7",
+                        "display":  "大七徽六分拨双/多弦6+7序列:bo@6+bo@7",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "6+7",
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "拨",
+                                           "finger_name":  "中指+食指",
+                                           "string":  "6+7"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "tiao_6":  {
+                   "char_key":  "tiao_6",
+                   "display":  "挑六",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  6
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指向外挑六弦空弦，散音，左手不按弦。"
+               },
+    "he":  {
+               "char_key":  "he",
+               "display":  "〔合〕",
+               "type":  "装饰音",
+               "left_hand":  {
+                                 "finger":  "随前音",
+                                 "string":  null,
+                                 "hui":  null
+                             },
+               "right_hand":  null,
+               "is_san":  false,
+               "is_fan":  false,
+               "meaning":  "古琴左手装饰技法：合，属于走手音修饰，作用于前序按音，不单独弹弦。"
+           },
+    "da_5_tiao_6":  {
+                        "char_key":  "da_5_tiao_6",
+                        "display":  "大五徽挑六弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  6,
+                                          "hui":  5
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "shang":  {
+                  "char_key":  "shang",
+                  "display":  "七徽六分〔上〕",
+                  "type":  "装饰音",
+                  "left_hand":  {
+                                    "finger":  "随前音",
+                                    "string":  null,
+                                    "hui":  null
+                                },
+                  "right_hand":  null,
+                  "is_san":  false,
+                  "is_fan":  false,
+                  "meaning":  "古琴左手装饰技法：上，属于走手音修饰，作用于前序按音，不单独弹弦。"
+              },
+    "da_9_gou_1":  {
+                       "char_key":  "da_9_gou_1",
+                       "display":  "大九勾一",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  1,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  1
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手大指按一弦九徽，右手中指向内勾一弦，得按音。"
+                   },
+    "fan_10_gou_6":  {
+                         "char_key":  "fan_10_gou_6",
+                         "display":  "泛10勾6",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  6,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  6
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_7_tiao_4":  {
+                        "char_key":  "da_7_tiao_4",
+                        "display":  "大七徽挑四弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  4,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  4
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "ti_4":  {
+                 "char_key":  "ti_4",
+                 "display":  "九徽剔四弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "剔",
+                                    "finger_name":  "中指",
+                                    "string":  4
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手中指剔，散音，左手不按弦。"
+             },
+    "tiao_2":  {
+                   "char_key":  "tiao_2",
+                   "display":  "挑二弦",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  2
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指挑，散音，左手不按弦。"
+               },
+    "da_7_gou_4":  {
+                       "char_key":  "da_7_gou_4",
+                       "display":  "大七徽勾四弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  4,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  4
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "cuo_3_6_da_9":  {
+                         "char_key":  "cuo_3_6_da_9",
+                         "display":  "大九徽撮双/多弦3+6",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "3+6",
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "3+6"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fu":  {
+               "char_key":  "fu",
+               "display":  "〔复〕",
+               "type":  "装饰音",
+               "left_hand":  {
+                                 "finger":  "随前音",
+                                 "string":  null,
+                                 "hui":  null
+                             },
+               "right_hand":  null,
+               "is_san":  false,
+               "is_fan":  false,
+               "meaning":  "古琴左手装饰技法：复，属于走手音修饰，作用于前序按音，不单独弹弦。"
+           },
+    "gou_1":  {
+                  "char_key":  "gou_1",
+                  "display":  "勾一弦",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  1
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指勾，散音，左手不按弦。"
+              },
+    "fan_7_gou_3":  {
+                        "char_key":  "fan_7_gou_3",
+                        "display":  "泛7勾3",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  3,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  3
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "da_6_2_tiao_7":  {
+                          "char_key":  "da_6_2_tiao_7",
+                          "display":  "大六徽二分挑七弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  7,
+                                            "hui":  6
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  7
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "mo_3":  {
+                 "char_key":  "mo_3",
+                 "display":  "抹三弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "抹",
+                                    "finger_name":  "食指",
+                                    "string":  3
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手食指抹，散音，左手不按弦。"
+             },
+    "fan_9_tiao_6":  {
+                         "char_key":  "fan_9_tiao_6",
+                         "display":  "泛9挑6",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  6,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  6
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_8_5_gou_2":  {
+                         "char_key":  "da_8_5_gou_2",
+                         "display":  "大八徽五分勾二弦〔上〕",
+                         "type":  "按音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  2,
+                                           "hui":  8
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  2
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "左手，右手，得按音。"
+                     },
+    "da_3":  {
+                 "char_key":  "da_3",
+                 "display":  "大三弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "打",
+                                    "finger_name":  "无名指",
+                                    "string":  3
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手无名指打，散音，左手不按弦。"
+             },
+    "fan_9_tiao_2":  {
+                         "char_key":  "fan_9_tiao_2",
+                         "display":  "泛9挑2",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  2,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  2
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "cuo_3_7_da_6":  {
+                         "char_key":  "cuo_3_7_da_6",
+                         "display":  "大六徽二分撮双/多弦3+7",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "3+7",
+                                           "hui":  6
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "3+7"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fan_cuo_4_7":  {
+                        "char_key":  "fan_cuo_4_7",
+                        "display":  "泛撮4+7",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点徽位",
+                                          "string":  "4+7",
+                                          "hui":  null
+                                      },
+                        "right_hand":  {
+                                           "finger":  "泛撮",
+                                           "finger_name":  "中指+食指",
+                                           "string":  "4+7"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音撮：左手轻点两弦对应徽位，右手同时撮4、7弦，双弦泛音同时发声，清越空灵。"
+                    },
+    "mo_7":  {
+                 "char_key":  "mo_7",
+                 "display":  "抹七弦",
+                 "type":  "散音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  "抹",
+                                    "finger_name":  "食指",
+                                    "string":  7
+                                },
+                 "is_san":  true,
+                 "is_fan":  false,
+                 "meaning":  "右手食指抹，散音，左手不按弦。"
+             },
+    "cuo_ming_10_gou_4_san_tiao_6":  {
+                                         "char_key":  "cuo_ming_10_gou_4_san_tiao_6",
+                                         "display":  "名十勾四＋散挑六（撮）",
+                                         "type":  "复合音",
+                                         "left_hand":  {
+                                                           "finger":  "名指",
+                                                           "string":  4,
+                                                           "hui":  10
+                                                       },
+                                         "right_hand":  {
+                                                            "finger":  "撮",
+                                                            "finger_name":  "中指+食指",
+                                                            "string":  "4+6"
+                                                        },
+                                         "is_san":  false,
+                                         "is_fan":  false,
+                                         "meaning":  "撮音：右手中指勾四弦（左手名指按十徽）与食指挑六弦散音同时发声，两弦同声。"
+                                     },
+    "fan_9_gou_5":  {
+                        "char_key":  "fan_9_gou_5",
+                        "display":  "泛9勾5",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  5,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  5
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_7_gou_4":  {
+                        "char_key":  "fan_7_gou_4",
+                        "display":  "泛7勾4",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  4,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  4
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_9_gou_4":  {
+                        "char_key":  "fan_9_gou_4",
+                        "display":  "泛9勾4",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  4,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  4
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_9_tiao_4":  {
+                         "char_key":  "fan_9_tiao_4",
+                         "display":  "泛9挑4",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  4,
+                                           "hui":  9
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  4
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "da_6_tiao_6":  {
+                        "char_key":  "da_6_tiao_6",
+                        "display":  "大六徽挑六弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  6,
+                                          "hui":  6
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "gou_2":  {
+                  "char_key":  "gou_2",
+                  "display":  "勾二",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  2
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指向内勾二弦空弦，散音，左手不按弦。"
+              },
+    "da_7_mo_5":  {
+                      "char_key":  "da_7_mo_5",
+                      "display":  "大七徽抹五弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  5,
+                                        "hui":  7
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  5
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "fan_7_gou_5":  {
+                        "char_key":  "fan_7_gou_5",
+                        "display":  "泛7勾5",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  5,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  5
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "cuo_7_5_da_5":  {
+                         "char_key":  "cuo_7_5_da_5",
+                         "display":  "大五徽撮双/多弦7+5",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "7+5",
+                                           "hui":  5
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "7+5"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "da_5_6_mo_7":  {
+                        "char_key":  "da_5_6_mo_7",
+                        "display":  "大五徽六分抹七弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  7,
+                                          "hui":  5
+                                      },
+                        "right_hand":  {
+                                           "finger":  "抹",
+                                           "finger_name":  "食指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "fan_7_tiao_2":  {
+                         "char_key":  "fan_7_tiao_2",
+                         "display":  "泛7挑2",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  2,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  2
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "fan_9_gou_3":  {
+                        "char_key":  "fan_9_gou_3",
+                        "display":  "泛9勾3",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  3,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  3
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_9_gou_6":  {
+                        "char_key":  "fan_9_gou_6",
+                        "display":  "泛9勾6",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  6,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  6
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "gou_3":  {
+                  "char_key":  "gou_3",
+                  "display":  "勾三",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "勾",
+                                     "finger_name":  "中指",
+                                     "string":  3
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手中指向内勾三弦空弦，散音，左手不按弦。"
+              },
+    "tangxia":  {
+                    "char_key":  "tangxia",
+                    "display":  "七徽六分〔淌下〕",
+                    "type":  "装饰音",
+                    "left_hand":  {
+                                      "finger":  "随前音",
+                                      "string":  null,
+                                      "hui":  null
+                                  },
+                    "right_hand":  null,
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "古琴左手装饰技法：淌下，属于走手音修饰，作用于前序按音，不单独弹弦。"
+                },
+    "tiao_7":  {
+                   "char_key":  "tiao_7",
+                   "display":  "挑七",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  7
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指向外挑七弦空弦，散音，左手不按弦。"
+               },
+    "zhuaqi":  {
+                   "char_key":  "zhuaqi",
+                   "display":  "〔抓起〕",
+                   "type":  "装饰音",
+                   "left_hand":  {
+                                     "finger":  "随前音",
+                                     "string":  null,
+                                     "hui":  null
+                                 },
+                   "right_hand":  null,
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "古琴左手装饰技法：抓起，属于走手音修饰，作用于前序按音，不单独弹弦。"
+               },
+    "da_6_2_tiao_6":  {
+                          "char_key":  "da_6_2_tiao_6",
+                          "display":  "大六徽二分挑六弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  6,
+                                            "hui":  6
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  6
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "jin":  {
+                "char_key":  "jin",
+                "display":  "六徽二分〔进〕",
+                "type":  "装饰音",
+                "left_hand":  {
+                                  "finger":  "随前音",
+                                  "string":  null,
+                                  "hui":  null
+                              },
+                "right_hand":  null,
+                "is_san":  false,
+                "is_fan":  false,
+                "meaning":  "古琴左手装饰技法：进，属于走手音修饰，作用于前序按音，不单独弹弦。"
+            },
+    "fan_7_tiao_5":  {
+                         "char_key":  "fan_7_tiao_5",
+                         "display":  "泛7挑5",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  5,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  5
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "tuo_6":  {
+                  "char_key":  "tuo_6",
+                  "display":  "托六弦",
+                  "type":  "散音",
+                  "left_hand":  null,
+                  "right_hand":  {
+                                     "finger":  "托",
+                                     "finger_name":  "拇指",
+                                     "string":  6
+                                 },
+                  "is_san":  true,
+                  "is_fan":  false,
+                  "meaning":  "右手拇指托，散音，左手不按弦。"
+              },
+    "tiao_3":  {
+                   "char_key":  "tiao_3",
+                   "display":  "挑三",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  3
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指向外挑三弦空弦，散音，左手不按弦。"
+               },
+    "da_7_gou_5":  {
+                       "char_key":  "da_7_gou_5",
+                       "display":  "大七徽勾五弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  5,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  5
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "fan_9_gou_1":  {
+                        "char_key":  "fan_9_gou_1",
+                        "display":  "泛9勾1",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  1,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  1
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "da_7_tuo_7":  {
+                       "char_key":  "da_7_tuo_7",
+                       "display":  "大七徽托七弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  7,
+                                         "hui":  7
+                                     },
+                       "right_hand":  {
+                                          "finger":  "托",
+                                          "finger_name":  "拇指",
+                                          "string":  7
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "cuo_6_3_da_7":  {
+                         "char_key":  "cuo_6_3_da_7",
+                         "display":  "大七徽撮双/多弦6+3",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "6+3",
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "6+3"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fan_10_gou_5":  {
+                         "char_key":  "fan_10_gou_5",
+                         "display":  "泛10勾5",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  5,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  5
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "tiao_5":  {
+                   "char_key":  "tiao_5",
+                   "display":  "挑五",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  5
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指向外挑五弦空弦，散音，左手不按弦。"
+               },
+    "fan_10_tiao_6":  {
+                          "char_key":  "fan_10_tiao_6",
+                          "display":  "泛10挑6",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  6,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  6
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "da_7_6_tiao_4":  {
+                          "char_key":  "da_7_6_tiao_4",
+                          "display":  "大七徽六分挑四弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  4,
+                                            "hui":  7
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  4
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "da_9_tiao_7":  {
+                        "char_key":  "da_9_tiao_7",
+                        "display":  "大九徽挑七弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  7,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "挑",
+                                           "finger_name":  "食指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "da_12_mo_7":  {
+                       "char_key":  "da_12_mo_7",
+                       "display":  "大十二徽抹七弦",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  7,
+                                         "hui":  12
+                                     },
+                       "right_hand":  {
+                                          "finger":  "抹",
+                                          "finger_name":  "食指",
+                                          "string":  7
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手，右手，得按音。"
+                   },
+    "_2_3":  {
+                 "char_key":  "_2_3",
+                 "display":  "die_juan双/多弦2+3",
+                 "type":  "复合音",
+                 "left_hand":  null,
+                 "right_hand":  {
+                                    "finger":  null,
+                                    "finger_name":  null,
+                                    "string":  "2+3"
+                                },
+                 "is_san":  false,
+                 "is_fan":  false,
+                 "meaning":  "复合指法：右手，多弦配合发声。"
+             },
+    "zhai_1_2":  {
+                     "char_key":  "zhai_1_2",
+                     "display":  "中十徽摘双/多弦1+2序列:zhai@1+zhai@2",
+                     "type":  "复合音",
+                     "left_hand":  null,
+                     "right_hand":  {
+                                        "finger":  "摘",
+                                        "finger_name":  "无名指",
+                                        "string":  "1+2"
+                                    },
+                     "is_san":  false,
+                     "is_fan":  false,
+                     "meaning":  "复合指法：右手，多弦配合发声。"
+                 },
+    "san_tiao_6":  {
+                       "char_key":  "san_tiao_6",
+                       "display":  "散挑六",
+                       "type":  "散音",
+                       "left_hand":  null,
+                       "right_hand":  {
+                                          "finger":  "挑",
+                                          "finger_name":  "食指",
+                                          "string":  6
+                                      },
+                       "is_san":  true,
+                       "is_fan":  false,
+                       "meaning":  "右手食指向外挑六弦空弦，散音，左手不按弦。"
+                   },
+    "da_6_2_mo_7":  {
+                        "char_key":  "da_6_2_mo_7",
+                        "display":  "大六徽二分抹七弦",
+                        "type":  "按音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  7,
+                                          "hui":  6
+                                      },
+                        "right_hand":  {
+                                           "finger":  "抹",
+                                           "finger_name":  "食指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "左手，右手，得按音。"
+                    },
+    "cuo_7_4_da_5":  {
+                         "char_key":  "cuo_7_4_da_5",
+                         "display":  "大五徽六分撮双/多弦7+4",
+                         "type":  "复合音",
+                         "left_hand":  {
+                                           "finger":  "大指",
+                                           "string":  "7+4",
+                                           "hui":  5
+                                       },
+                         "right_hand":  {
+                                            "finger":  "撮",
+                                            "finger_name":  "中指+食指",
+                                            "string":  "7+4"
+                                        },
+                         "is_san":  false,
+                         "is_fan":  false,
+                         "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                     },
+    "fan_10_tiao_2":  {
+                          "char_key":  "fan_10_tiao_2",
+                          "display":  "泛10挑2",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  2,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  2
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "da_5_6_tiao_7":  {
+                          "char_key":  "da_5_6_tiao_7",
+                          "display":  "大五徽六分挑七弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  7,
+                                            "hui":  5
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  7
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "fan_10_tiao_4":  {
+                          "char_key":  "fan_10_tiao_4",
+                          "display":  "泛10挑4",
+                          "type":  "泛音",
+                          "left_hand":  {
+                                            "finger":  "轻点",
+                                            "string":  4,
+                                            "hui":  10
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  4
+                                         },
+                          "is_san":  false,
+                          "is_fan":  true,
+                          "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                      },
+    "da_7_9_tiao_3":  {
+                          "char_key":  "da_7_9_tiao_3",
+                          "display":  "大七徽九分挑三弦",
+                          "type":  "按音",
+                          "left_hand":  {
+                                            "finger":  "大指",
+                                            "string":  3,
+                                            "hui":  7
+                                        },
+                          "right_hand":  {
+                                             "finger":  "挑",
+                                             "finger_name":  "食指",
+                                             "string":  3
+                                         },
+                          "is_san":  false,
+                          "is_fan":  false,
+                          "meaning":  "左手，右手，得按音。"
+                      },
+    "daiqi":  {
+                  "char_key":  "daiqi",
+                  "display":  "〔带起〕",
+                  "type":  "装饰音",
+                  "left_hand":  {
+                                    "finger":  "随前音",
+                                    "string":  null,
+                                    "hui":  null
+                                },
+                  "right_hand":  null,
+                  "is_san":  false,
+                  "is_fan":  false,
+                  "meaning":  "古琴左手装饰技法：带起，属于走手音修饰，作用于前序按音，不单独弹弦。"
+              },
+    "da_7_mo_4":  {
+                      "char_key":  "da_7_mo_4",
+                      "display":  "大七徽抹四弦",
+                      "type":  "按音",
+                      "left_hand":  {
+                                        "finger":  "大指",
+                                        "string":  4,
+                                        "hui":  7
+                                    },
+                      "right_hand":  {
+                                         "finger":  "抹",
+                                         "finger_name":  "食指",
+                                         "string":  4
+                                     },
+                      "is_san":  false,
+                      "is_fan":  false,
+                      "meaning":  "左手，右手，得按音。"
+                  },
+    "da_9_gou_4":  {
+                       "char_key":  "da_9_gou_4",
+                       "display":  "大九勾四",
+                       "type":  "按音",
+                       "left_hand":  {
+                                         "finger":  "大指",
+                                         "string":  4,
+                                         "hui":  9
+                                     },
+                       "right_hand":  {
+                                          "finger":  "勾",
+                                          "finger_name":  "中指",
+                                          "string":  4
+                                      },
+                       "is_san":  false,
+                       "is_fan":  false,
+                       "meaning":  "左手大指按四弦九徽，右手中指向内勾四弦，得按音。"
+                   },
+    "fan_7_gou_1":  {
+                        "char_key":  "fan_7_gou_1",
+                        "display":  "泛7勾1",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  1,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  1
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_7_tiao_6":  {
+                         "char_key":  "fan_7_tiao_6",
+                         "display":  "泛7挑6",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  6,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  6
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "fan_10_gou_3":  {
+                         "char_key":  "fan_10_gou_3",
+                         "display":  "泛10勾3",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  3,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  3
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "tui":  {
+                "char_key":  "tui",
+                "display":  "七徽〔退〕",
+                "type":  "装饰音",
+                "left_hand":  {
+                                  "finger":  "随前音",
+                                  "string":  null,
+                                  "hui":  null
+                              },
+                "right_hand":  null,
+                "is_san":  false,
+                "is_fan":  false,
+                "meaning":  "古琴左手装饰技法：退，属于走手音修饰，作用于前序按音，不单独弹弦。"
+            },
+    "fan_9_gou_7":  {
+                        "char_key":  "fan_9_gou_7",
+                        "display":  "泛9勾7",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  7,
+                                          "hui":  9
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "fan_7_gou_7":  {
+                        "char_key":  "fan_7_gou_7",
+                        "display":  "泛7勾7",
+                        "type":  "泛音",
+                        "left_hand":  {
+                                          "finger":  "轻点",
+                                          "string":  7,
+                                          "hui":  7
+                                      },
+                        "right_hand":  {
+                                           "finger":  "勾",
+                                           "finger_name":  "中指",
+                                           "string":  7
+                                       },
+                        "is_san":  false,
+                        "is_fan":  true,
+                        "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                    },
+    "tiao_4":  {
+                   "char_key":  "tiao_4",
+                   "display":  "挑四",
+                   "type":  "散音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "挑",
+                                      "finger_name":  "食指",
+                                      "string":  4
+                                  },
+                   "is_san":  true,
+                   "is_fan":  false,
+                   "meaning":  "右手食指向外挑四弦空弦，散音，左手不按弦。"
+               },
+    "fan_7_tiao_3":  {
+                         "char_key":  "fan_7_tiao_3",
+                         "display":  "泛7挑3",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  3,
+                                           "hui":  7
+                                       },
+                         "right_hand":  {
+                                            "finger":  "挑",
+                                            "finger_name":  "食指",
+                                            "string":  3
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     },
+    "ming_10_tiao_4":  {
+                           "char_key":  "ming_10_tiao_4",
+                           "display":  "名十挑四",
+                           "type":  "按音",
+                           "left_hand":  {
+                                             "finger":  "名指",
+                                             "string":  4,
+                                             "hui":  10
+                                         },
+                           "right_hand":  {
+                                              "finger":  "挑",
+                                              "finger_name":  "食指",
+                                              "string":  4
+                                          },
+                           "is_san":  false,
+                           "is_fan":  false,
+                           "meaning":  "左手无名指按四弦十徽，右手食指向外挑四弦，得按音。"
+                       },
+    "bo_1_2":  {
+                   "char_key":  "bo_1_2",
+                   "display":  "中十徽拨双/多弦1+2序列:bo@1+bo@2",
+                   "type":  "复合音",
+                   "left_hand":  null,
+                   "right_hand":  {
+                                      "finger":  "拨",
+                                      "finger_name":  "中指+食指",
+                                      "string":  "1+2"
+                                  },
+                   "is_san":  false,
+                   "is_fan":  false,
+                   "meaning":  "复合指法：右手，多弦配合发声。"
+               },
+    "cuo_6_4":  {
+                    "char_key":  "cuo_6_4",
+                    "display":  "中撮双/多弦6+4",
+                    "type":  "复合音",
+                    "left_hand":  null,
+                    "right_hand":  {
+                                       "finger":  "撮",
+                                       "finger_name":  "中指+食指",
+                                       "string":  "6+4"
+                                   },
+                    "is_san":  false,
+                    "is_fan":  false,
+                    "meaning":  "复合指法：右手，多弦配合发声。"
+                },
+    "li_7_6_da_5":  {
+                        "char_key":  "li_7_6_da_5",
+                        "display":  "大五徽历双/多弦7+6序列:tiao@7+tiao@6",
+                        "type":  "复合音",
+                        "left_hand":  {
+                                          "finger":  "大指",
+                                          "string":  "7+6",
+                                          "hui":  5
+                                      },
+                        "right_hand":  {
+                                           "finger":  "历",
+                                           "finger_name":  "食指",
+                                           "string":  "7+6"
+                                       },
+                        "is_san":  false,
+                        "is_fan":  false,
+                        "meaning":  "复合指法：右手，左手大指按，多弦配合发声。"
+                    },
+    "fan_10_gou_4":  {
+                         "char_key":  "fan_10_gou_4",
+                         "display":  "泛10勾4",
+                         "type":  "泛音",
+                         "left_hand":  {
+                                           "finger":  "轻点",
+                                           "string":  4,
+                                           "hui":  10
+                                       },
+                         "right_hand":  {
+                                            "finger":  "勾",
+                                            "finger_name":  "中指",
+                                            "string":  4
+                                        },
+                         "is_san":  false,
+                         "is_fan":  true,
+                         "meaning":  "泛音：左手手指轻点，右手，得清透泛音，空灵清亮。"
+                     }
 }

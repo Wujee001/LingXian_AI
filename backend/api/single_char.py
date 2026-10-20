@@ -1,61 +1,52 @@
 # -*- coding: utf-8 -*-
-"""
-单减字识别接口模块
-
-V1 核心：上传单个减字图片→classifier 识别 Top-3 候选→
-parser 查知识库解析首选→返回候选置信度与演奏信息。
-模型线 .pth 权重交付后仅替换 classifier，本接口不动。
-
-作者：
-    @Wujee
-
-创建日期：2026-10-08
-版本：1.0.0
-
-许可证：内部使用，未经许可不得传播。
-
-"""
-
+"""单减字识别接口（纯本地两阶段，无云API）"""
 import io
+import os
+from fastapi import APIRouter, File, HTTPException, UploadFile
+from PIL import Image, UnidentifiedImageError
 
-from fastapi import APIRouter, UploadFile, File
-from PIL import Image
-
-from service.classifier import predict_crop
 from service.parser import char_parse
-from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_EXCEPTION
+from service.stage2_infer import predict_crop, available as stage2_available
+from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_WARN
 
 router = APIRouter()
+ALLOWED = {'.jpg', '.jpeg', '.png'}
+MAX_UPLOAD = 20 * 1024 * 1024
 
 
-@router.post("/predict")
+@router.post('/predict')
 async def single_predict(file: UploadFile = File(...)):
-    """上传单个减字图片，返回 Top-3 候选与首选解析。"""
+    ext = os.path.splitext(file.filename or '')[1].lower()
+    if ext not in ALLOWED:
+        MLN_LOG_WARN("单字上传格式不支持：%s", file.filename)
+        raise HTTPException(status_code=400, detail='仅支持 PNG/JPG/JPEG')
+    content = await file.read()
+    if len(content) > MAX_UPLOAD:
+        raise HTTPException(status_code=413, detail='图片超过20MB')
     try:
-        contents = await file.read()
-        img = Image.open(io.BytesIO(contents))
+        image = Image.open(io.BytesIO(content)).convert('RGB')
+        image.load()
+    except (UnidentifiedImageError, OSError, ValueError):
+        raise HTTPException(status_code=400, detail='图片无法读取')
 
-        candidates = predict_crop(img)
-        top_key, top_conf = candidates[0]
-        parse_result = char_parse(top_key)
+    if not stage2_available():
+        MLN_LOG_WARN("本地识别模型未加载，拒绝请求")
+        raise HTTPException(status_code=503, detail='本地模型未就绪，请联系开发人员检查')
 
-        MLN_LOG_INFO(
-            "单字识别：%s，首选=%s 置信度=%.2f",
-            file.filename, top_key, top_conf,
-        )
+    ok, candidates = predict_crop(image)
+    if not ok or not candidates:
+        raise HTTPException(status_code=500, detail='识别失败，请联系开发人员检查')
 
-        return {
-            "success": True,
-            "data": {
-                "candidates": [
-                    {"class_key": key, "confidence": conf}
-                    for key, conf in candidates
-                ],
-                "top_key": top_key,
-                "top_confidence": top_conf,
-                "parse_result": parse_result,
-            },
+    key, conf = candidates[0]
+    MLN_LOG_INFO("单字本地识别完成：%s 置信度=%.3f", key, conf)
+    return {
+        'success': True,
+        'data': {
+            'candidates': candidates,
+            'top_key': key,
+            'top_confidence': conf,
+            'parse_result': char_parse(key),
+            'source': 'local',
+            'status': 'U',
         }
-    except Exception as e:
-        MLN_LOG_EXCEPTION("单字识别异常：%s", e)
-        return {"success": False, "data": {"msg": f"识别失败：{e}"}}
+    }

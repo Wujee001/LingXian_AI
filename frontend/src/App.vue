@@ -2,92 +2,77 @@
 <!--
   根组件（泠弦智谱 V1）
 
-  顶部国风标题栏（标题 + 朱砂印章）与功能切换：
-  单减字识别 / 整谱打谱（含指法解析与节奏划分）。
-  面向古琴学习者；模型权重与参数由后端本地维护。
+  顶部古籍书名区（行楷书名 + 朱砂双印 + 琴弦分隔纹），
+  下方四枚仿木牌签条，对应 router 四条路由：
+    单字释读 / 整谱打谱 / 减字库 / 智能句读。
 
-  作者：
-      @Wujee
-
-  创建日期：2026-10-1
-  版本：1.0.0
-
-  许可证：内部使用，未经许可不得传播。
+  作者：@Wujee
+  更新日期：2026-10-13
+  版本：1.3.0（4 Tab + 路由视图）
 -->
 
 <template>
   <div class="app">
-    <header class="gu-header">
-      <div class="gu-seal">泠弦<br />智谱</div>
-      <div>
-        <div class="gu-title">泠 弦 智 谱</div>
-        <div class="gu-subtitle">古琴减字谱 · 智能识别与打谱</div>
+    <!-- 顶部书题 -->
+    <header class="scroll-header">
+      <div class="title-row">
+        <div class="seal-side"><span>泠</span><span>弦</span></div>
+        <div class="title-block">
+          <h1 class="main-title">泠弦智谱</h1>
+          <div class="sub-title">古琴减字谱 · 释读与打谱</div>
+        </div>
+        <div class="seal-side"><span>智</span><span>谱</span></div>
+      </div>
+      <div class="header-rule">
+        <span class="rule-line"></span>
+        <span class="rule-orn">❖</span>
+        <span class="rule-line"></span>
       </div>
     </header>
 
-    <div class="tabs-wrap">
-      <el-tabs v-model="tab" class="gu-tabs">
-        <el-tab-pane name="single">
-          <template #label>
-            <span class="tab-label">单减字识别</span>
-          </template>
-        </el-tab-pane>
-        <el-tab-pane name="sheet">
-          <template #label>
-            <span class="tab-label">整谱打谱 · 节奏划分</span>
-          </template>
-        </el-tab-pane>
-      </el-tabs>
-    </div>
+    <!-- 仿木牌导航（4 Tab） -->
+    <nav class="scroll-nav">
+      <div v-for="t in tabs" :key="t.key"
+           class="nav-item"
+           :class="{ active: route.path === t.path }"
+           @click="go(t.path)">
+        {{ t.label }}
+      </div>
+    </nav>
 
-    <main class="gu-main">
-      <SingleChar v-show="tab === 'single'" />
-      <WholeSheet v-show="tab === 'sheet'" />
+    <!-- 主体（路由视图） -->
+    <main class="scroll-main">
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </main>
+
+    <footer class="scroll-footer">
+      <span>泠弦智谱 · 传承古琴减字谱释读</span>
+    </footer>
   </div>
 </template>
 
 <script setup>
 /*
- * 根组件：布局 + 功能切换；日志见 logger.js，后端 mlnlog。
+ * 根组件：书名区 + 4 Tab 木牌导航 + 路由视图。
+ * keep-alive：切 Tab 时保留各页状态（上传图、画框等不丢）。
  */
-import { ref } from 'vue'
-import SingleChar from './views/SingleChar.vue'
-import WholeSheet from './views/WholeSheet.vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const tab = ref('single')
+const route = useRoute()
+const router = useRouter()
+
+const tabs = [
+  { key: 'single',    label: '单字释读', path: '/single' },
+  { key: 'sheet',     label: '整谱打谱', path: '/sheet' },
+  { key: 'knowledge', label: '减 字 库', path: '/knowledge' },
+  { key: 'judou',     label: '智能句读', path: '/judou' }
+]
+
+function go(path) {
+  if (route.path !== path) router.push(path)
+}
 </script>
-
-<style scoped>
-.gu-header {
-  display: flex; align-items: center; justify-content: center;
-  gap: 16px; padding: 22px 16px 6px;
-}
-.gu-title {
-  font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
-  font-size: 30px; font-weight: 700; letter-spacing: 8px; color: var(--ink);
-}
-.gu-subtitle {
-  font-size: 12.5px; color: var(--ink-soft); letter-spacing: 3px; margin-top: 4px;
-}
-.gu-seal {
-  width: 46px; height: 46px; border-radius: 6px;
-  background: var(--zhusha); color: #f7ecd9;
-  font-family: 'KaiTi','STKaiti',serif;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; line-height: 1.1; text-align: center;
-  box-shadow: 0 2px 6px rgba(178,58,46,0.35);
-}
-
-.tabs-wrap { max-width: 1280px; margin: 0 auto; padding: 0 18px; }
-.gu-tabs { margin-bottom: 4px; }
-.tab-label {
-  font-family: 'KaiTi','STKaiti',serif; font-size: 16px; letter-spacing: 3px;
-}
-.gu-tabs :deep(.el-tabs__item.is-active) { color: var(--zhusha); }
-.gu-tabs :deep(.el-tabs__active-bar) { background-color: var(--zhusha); }
-.gu-tabs :deep(.el-tabs__item:hover) { color: var(--zhusha); }
-.gu-tabs :deep(.el-tabs__nav-wrap::after) { background-color: var(--line); }
-
-.gu-main { max-width: 1280px; margin: 0 auto; padding: 8px 18px 28px; }
-</style>

@@ -47,6 +47,10 @@ app.include_router(single_char.router, prefix="/api/char", tags=["单字识别"]
 app.include_router(knowledge.router, prefix="/api/knowledge", tags=["知识库"])
 app.include_router(judou.router, prefix="/api/judou", tags=["智能句读"])
 
+# 启动时预加载Stage2 ResNet权重，直接打印加载日志
+from service import stage2_infer
+stage2_infer.available()
+
 
 @app.get("/")
 async def health():

@@ -1,7 +1,7 @@
 # ============================================================
 # 泠弦智谱 LingXianAI 后端依赖（Python 3.10）
 # 安装：pip install -r requirements.txt
-# 作者：@Wujee  版本：1.0.0  许可证：内部使用，未经许可不得传播
+# 作者：@Wujee  版本：2.0.0  许可证：内部使用，未经许可不得传播
 # ============================================================
 
 # ---- Web 框架与服务 ----
@@ -15,14 +15,15 @@ opencv-python>=4.8
 numpy>=1.24
 
 # ============================================================
-# 真实模型推理依赖（权重交付后才需要，假模型阶段可不装）
-# 体积较大，建议单独安装 CPU 版，不要直接 pip install torch：
+# 本地 YOLO 推理（主识别路线，模型线交付 best.pt 后必需）
+# ultralytics 会自动带入 torch / torchvision。
+# 本机 CPU 推理、无 GPU，建议先装 CPU 版 torch，避免拉取巨大的 CUDA 包：
 #
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#   pip install ultralytics
 #
-# 装妥后把 resnet18_qin.pth 与 class_mapping.json 放入
-# backend/models/，classifier.py 会自动加载，无需改代码。
-# （下方两行保留，联网执行 pip install -r 时会装默认 GPU/CPU 版）
+# 然后把训练好的权重放到 backend/models/best.pt，
+# service/yolo_infer.py 会自动加载，无需改代码。
+# 未安装时检测/识别功能不可用，服务可正常启动但无法推理。
 # ============================================================
-# torch>=2.1
-# torchvision>=0.16
+ultralytics>=8.1

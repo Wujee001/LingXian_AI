@@ -1,29 +1,7 @@
 <!-- -*- coding: utf-8 -*- -->
-<!--
-  整谱打谱页面（泠弦智谱 V1）
-
-  面向古琴学习者：上传原版减字谱（无需节拍标注）→
-  一键检测生成减字框 → 点框查看 Top-3 候选、指法解析、
-  节奏句读标记 → 可切换候选、拖框、删框、手动画框、
-  确认或标复核 → 底部按演奏顺序输出减字序列并可导出。
-
-  数据来源判断型：优先调用后端 /api/sheet/upload（规则检测
-  + 分类 + 解析）；后端未启动 / 报错时自动回退内置模拟框，
-  工具栏以标签标明「后端识别 / 演示数据」，保证可独立演示。
-
-  作者：
-      @Wujee
-
-  更新日期：2026-10-12
-  版本：1.1.0
-
-  许可证：内部使用，未经许可不得传播。
--->
-
 <template>
   <div class="whole-sheet">
-    <!-- 工具栏 -->
-    <el-card shadow="never">
+    <el-card shadow="never" class="leaf">
       <div class="toolbar">
         <el-upload :auto-upload="false" show-file-list="false"
                    accept=".png,.jpg,.jpeg" :on-change="onPick">
@@ -32,100 +10,122 @@
         <el-button type="success" plain :disabled="!imageUrl" :loading="detecting" @click="genBoxes">
           一键画框
         </el-button>
-        <el-button plain :disabled="!items.length" @click="clearAll">清除</el-button>
+        <el-button plain :disabled="!items.length || judouLoading" :loading="judouLoading"
+                   @click="fetchJudou">智能句读</el-button>
+        <el-button plain :disabled="!items.length" @click="clearAll">清 除</el-button>
         <el-button plain :disabled="!items.length" @click="exportResult">
           导出打谱结果
         </el-button>
-        <el-tag v-if="items.length" size="small" :type="fromBackend ? 'success' : 'warning'">
-          {{ fromBackend ? '后端识别' : '演示数据' }}
-        </el-tag>
+        <el-tag v-if="items.length" size="small" type="success">本地模型识别</el-tag>
         <span class="fname" v-if="fileName">{{ fileName }}</span>
       </div>
     </el-card>
 
-    <!-- 主体 -->
     <div v-if="items.length" class="work">
-      <el-card shadow="never" class="canvas-card">
-        <SheetCanvas :image-url="imageUrl" v-model:boxes="items" @select="onSelect" />
+      <el-card shadow="never" class="canvas-card leaf">
+        <SheetCanvas :image-url="imageUrl" v-model:boxes="items"
+                     @select="onSelect" @box-added="onBoxAdded" />
       </el-card>
 
-      <el-card shadow="never" class="panel-card">
-        <div v-if="cur === null" class="empty">点击左侧任意框<br />查看识别与解析</div>
+      <el-card shadow="never" class="panel-card leaf">
+        <div v-if="cur === null" class="empty">点击左侧任一框<br />查看释读与释义</div>
 
         <template v-else>
           <div class="p-title">
-            第 {{ selectedIdx + 1 }} 个减字
+            <span>第 {{ selectedIdx + 1 }} 字</span>
             <el-tag size="small" :type="cur.status === 'U' ? 'danger' : 'success'">
               {{ cur.status === 'U' ? '待复核' : '已确认' }}
             </el-tag>
           </div>
 
-          <div class="blk">识别候选（Top-3）</div>
-          <el-radio-group v-model="cur.pick" @change="reparse">
+          <div class="blk"><span class="blk-orn">○</span> 识别候选</div>
+
+          <div v-if="cur.recognizing" class="hint-hint">识别中，请稍候…</div>
+
+          <el-radio-group v-else-if="cur.candidates && cur.candidates.length"
+                          v-model="cur.pick" @change="reparse">
             <el-radio v-for="c in cur.candidates" :key="c[0]"
                       :label="c[0]" border size="small" class="cand">
-              {{ c[0] }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
+              {{ cur.parse_result.display_name }} <span class="conf">{{ (c[1] * 100).toFixed(0) }}%</span>
             </el-radio>
           </el-radio-group>
 
-          <div class="blk">指法解析</div>
-          <div class="parse">
-            <div>右手：{{ cur.parse_result.right_hand.finger }} · {{ cur.parse_result.right_hand.string }}</div>
-            <div>左手：{{ cur.parse_result.left_hand.finger }} · {{ cur.parse_result.left_hand.hui }}</div>
-            <div class="meaning">{{ cur.parse_result.meaning }}</div>
+          <div v-else class="hint-hint">
+            本地模型未给出可靠结果，请手动修正
           </div>
 
-          <div class="blk">节奏 / 句读</div>
+          <div class="blk"><span class="blk-orn">○</span> 指法释义</div>
+          <div class="parse">
+            <div class="parse-row">
+              <span class="k">右 手</span>{{ cur.parse_result.right_hand_text }}
+            </div>
+            <div class="parse-row">
+              <span class="k">左 手</span>{{ cur.parse_result.left_hand_text }}
+            </div>
+            <div class="meaning">{{ cur.parse_result.desc }}</div>
+          </div>
+
+          <div class="blk">
+            <span class="blk-orn">○</span> 节奏 · 句读
+            <span v-if="cur.rhythmConf != null" class="conf-inline">
+              置信度 {{ (cur.rhythmConf * 100).toFixed(0) }}%
+            </span>
+          </div>
           <el-select v-model="cur.rhythm" size="small" style="width:100%">
-            <el-option label="连续（C）" value="C" />
-            <el-option label="短停（S）" value="S" />
-            <el-option label="长停（L）" value="L" />
-            <el-option label="句末（E）" value="E" />
+            <el-option label="连 续（C）" value="C" />
+            <el-option label="短 停（S）" value="S" />
+            <el-option label="长 停（L）" value="L" />
+            <el-option label="句 末（E）" value="E" />
+            <el-option label="待复核（U）" value="U" />
           </el-select>
 
           <div class="actions">
-            <el-button type="success" size="small" @click="confirmItem">确认</el-button>
-            <el-button type="warning" size="small" @click="markReview">标记复核</el-button>
+            <el-button type="success" size="small" @click="confirmItem">确 认</el-button>
+            <el-button type="warning" size="small" @click="openCorrectDialog">识别有误，手动修正</el-button>
           </div>
         </template>
       </el-card>
     </div>
 
-    <!-- 空状态 -->
-    <el-card v-else shadow="never" class="blank">
+    <el-card v-else shadow="never" class="blank leaf">
       <el-empty description="请先上传一张减字谱，再点击「一键画框」" />
     </el-card>
 
-    <!-- 减字序列 -->
-    <el-card v-if="items.length" shadow="never" class="seq-card">
-      <div class="blk">整谱减字序列（按演奏顺序）</div>
+    <el-card v-if="items.length" shadow="never" class="seq-card leaf">
+      <div class="blk"><span class="blk-orn">○</span> 整谱减字序列（按演奏顺序）</div>
       <div class="seq">
         <template v-for="(it, i) in items" :key="i">
           <el-tag :type="it.status === 'U' ? 'danger' : 'info'" size="small" class="seq-tag">
-            {{ it.pick }}
+            {{ it.parse_result.display_name || it.pick }}
           </el-tag>
           <span v-if="it.rhythm && it.rhythm !== 'C'" class="rh">{{ it.rhythm }}</span>
         </template>
       </div>
     </el-card>
+
+    <!-- 手动修正弹窗 -->
+    <el-dialog v-model="correctDialogVisible" title="手动修正识别结果" width="420px">
+      <el-form label-width="90px">
+        <el-form-item label="原识别结果">
+          <el-input :value="cur ? cur.pick : ''" disabled />
+        </el-form-item>
+        <el-form-item label="正确减字">
+          <el-input v-model="correctKey" placeholder="请输入正确的减字名称" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="correctDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitCorrect">提交反馈</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-/*
- * 页面逻辑：后端 /api/sheet/upload 优先、模拟框兜底；
- * 操作埋点 logger.js，后端业务日志统一 mlnlog。
- */
 import { ElMessage } from 'element-plus'
 import SheetCanvas from '../components/SheetCanvas.vue'
-import { uploadSheet } from '../api/index.js'
-import { logInfo, logWarn } from '../logger.js'
-
-const KEY_POOL = ['da_9_gou_4', 'san_tiao_7', 'gou_5', 'ming_10_gou_5', 'tiao_6']
-
-// 弦序 / 徽位数字转中文
-const XIAN = ['', '一', '二', '三', '四', '五', '六', '七']
-const HUI_MAP = { 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六', 7: '七', 8: '八', 9: '九', 10: '十', 11: '十一', 12: '十二', 13: '十三' }
+import { uploadSheet, submitCorrection, segmentJudou, predictSingle } from '../api/index.js'
+import { logInfo } from '../logger.js'
 
 export default {
   name: 'WholeSheet',
@@ -137,8 +137,12 @@ export default {
       fileName: '',
       items: [],
       selectedIdx: null,
-      fromBackend: false,
-      detecting: false
+      backendImageUrl: '',
+      detecting: false,
+      judouLoading: false,
+      correctDialogVisible: false,
+      correctKey: '',
+      submitting: false
     }
   },
   computed: {
@@ -153,10 +157,10 @@ export default {
       this.fileName = file.name
       this.items = []
       this.selectedIdx = null
-      this.fromBackend = false
+      this.backendImageUrl = ''
       logInfo('上传减字谱', file.name)
     },
-    // 一键画框：后端优先，失败回退模拟框
+
     async genBoxes() {
       if (!this.rawFile) return
       this.detecting = true
@@ -172,144 +176,279 @@ export default {
           w: it.box.w,
           h: it.box.h,
           status: it.status || 'A',
-          candidates: (it.candidates || []).map(c => [c[0], c[1]]),
+          candidates: it.candidates || [],
           pick: (it.candidates && it.candidates[0] && it.candidates[0][0]) || 'unknown',
+          raw_label: it.raw_label || '',
           rhythm: 'C',
-          parse_result: this.fmtParse(it.parse_result)
+          rhythmConf: null,
+          parse_result: it.parse_result || this.emptyParse(),
+          recognizing: false
         }))
-        this.fromBackend = true
-        logInfo('整谱检测完成（后端）', `共 ${this.items.length} 框`)
-        if (!this.items.length) ElMessage.info('后端未检测到减字框，可换用背景干净的谱图或手动画框')
+        this.backendImageUrl = body.data.image_url || ''
+        logInfo('整谱本地检测完成', `共 ${this.items.length} 框`)
+        if (!this.items.length) ElMessage.info('未检测到减字框，请更换清晰谱图')
       } catch (e) {
-        logWarn('后端整谱检测不可用，回退模拟框', e && e.message)
-        ElMessage.warning('后端未连接或检测异常，当前使用演示框')
-        this.items = this.buildFakeBoxes()
-        this.fromBackend = false
-        logInfo('一键画框完成（演示）', `共 ${this.items.length} 框`)
+        ElMessage.error('识别服务异常，请联系开发人员检查')
       } finally {
         this.detecting = false
       }
+      if (this.items.length) await this.fetchJudou()
     },
-    // 演示兜底：3 列（竖排从右往左）× 4 行示意框
-    buildFakeBoxes() {
-      const boxes = []
-      const cols = 3, rows = 4
-      const cw = 0.22, ch = 0.16, gx = 0.07, gy = 0.06, x0 = 0.1, y0 = 0.08
-      for (let c = 0; c < cols; c++) {
-        const x = 1 - x0 - (c + 1) * cw - c * gx
-        for (let r = 0; r < rows; r++) {
-          boxes.push({
-            x: Number(x.toFixed(4)),
-            y: Number((y0 + r * (ch + gy)).toFixed(4)),
-            w: cw, h: ch
-          })
+
+    async onBoxAdded(idx) {
+      const it = this.items[idx]
+      if (!it) return
+      it.recognizing = true
+      try {
+        const file = await this.cropByBox(this.imageUrl, it)
+        const res = await predictSingle(file)
+        const body = res && res.data
+        if (!body || !body.success || !body.data || !Array.isArray(body.data.candidates)) {
+          throw new Error('识别返回异常')
         }
+        it.candidates = body.data.candidates
+        it.pick = body.data.top_key || (it.candidates[0] && it.candidates[0][0]) || 'unknown'
+        it.parse_result = body.data.parse_result
+        if (it.candidates.length) {
+          it.status = (it.candidates[0][1] >= 0.6) ? 'A' : 'U'
+        }
+      } catch (e) {
+        it.candidates = []
+        it.pick = 'unknown'
+        it.parse_result = this.emptyParse()
+        it.status = 'U'
+        ElMessage.error('识别失败，请联系开发人员检查')
+      } finally {
+        it.recognizing = false
       }
-      return boxes.map((b, i) => this.fakeItem(b, i))
     },
-    fakeItem(box, i) {
-      const k0 = KEY_POOL[i % KEY_POOL.length]
+
+    cropByBox(imageUrl, box) {
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => {
+          const nw = img.naturalWidth
+          const nh = img.naturalHeight
+          const x = Math.max(0, Math.round(box.x * nw))
+          const y = Math.max(0, Math.round(box.y * nh))
+          const w = Math.max(1, Math.min(nw - x, Math.round(box.w * nw)))
+          const h = Math.max(1, Math.min(nh - y, Math.round(box.h * nh)))
+          const canvas = document.createElement('canvas')
+          canvas.width = w
+          canvas.height = h
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(img, x, y, w, h, 0, 0, w, h)
+          canvas.toBlob(blob => {
+            if (!blob) return reject(new Error('canvas 输出为空'))
+            resolve(new File([blob], 'crop.png', { type: 'image/png' }))
+          }, 'image/png')
+        }
+        img.onerror = () => reject(new Error('图片加载失败'))
+        img.src = imageUrl
+      })
+    },
+
+    emptyParse() {
       return {
-        ...box,
-        status: i % 5 === 4 ? 'U' : 'A',
-        candidates: [
-          [k0, 0.82],
-          [KEY_POOL[(i + 1) % KEY_POOL.length], 0.11],
-          [KEY_POOL[(i + 2) % KEY_POOL.length], 0.04]
-        ],
-        pick: k0,
-        rhythm: 'C',
-        parse_result: this.fakeParse(k0)
+        display_name: '—',
+        right_hand_text: '—',
+        left_hand_text: '—',
+        desc: '暂未识别，请手动修正'
       }
     },
-    // 后端 parse_result 归一化（兼容左右手为 null、string 为数字）
-    fmtParse(p) {
-      if (!p) return this.fakeParse('unknown')
-      const rh = p.right_hand || {}
-      const lh = p.left_hand
-      return {
-        right_hand: {
-          finger: rh.finger || '—',
-          string: rh.string != null ? (XIAN[rh.string] || String(rh.string)) + '弦' : '—'
-        },
-        left_hand: lh
-          ? { finger: lh.finger || '—', hui: lh.hui != null ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : '—' }
-          : { finger: '散音（不按弦）', hui: '—' },
-        meaning: p.meaning || '暂未收录该减字释义'
+
+    async fetchJudou() {
+      if (!this.items.length) return
+      this.judouLoading = true
+      try {
+        const chars = this.items.map(it => it.pick)
+        const res = await segmentJudou(chars)
+        const body = res && res.data
+        const segs = (body && body.success && body.data && body.data.segments) || []
+        if (!Array.isArray(segs) || !segs.length) throw new Error('句读返回为空')
+        segs.forEach(s => {
+          const it = this.items[s.index]
+          if (it) {
+            it.rhythm = s.label || 'C'
+            it.rhythmConf = typeof s.confidence === 'number' ? s.confidence : null
+          }
+        })
+      } catch (e) {
+      } finally {
+        this.judouLoading = false
       }
     },
-    fakeParse(key) {
-      return {
-        right_hand: { finger: '勾', string: '三弦' },
-        left_hand: { finger: '散音（不按弦）', hui: '—' },
-        meaning: '【演示数据】右手中指向内弹三弦，散音。'
-      }
-    },
+
     onSelect(i) {
       this.selectedIdx = i
-      if (i !== null) logInfo('选中减字', this.items[i].pick)
     },
     reparse(key) {
-      this.cur.parse_result = {
-        right_hand: { finger: '—', string: '—' },
-        left_hand: { finger: '—', hui: '—' },
-        meaning: '切换候选后，该框释义以人工确认为准（可在后端补充按候选重查）。'
-      }
       this.cur.status = 'U'
-      logWarn('切换识别候选', key)
     },
-    confirmItem() {
+
+    async confirmItem() {
       this.cur.status = 'A'
-      logInfo('确认减字', this.cur.pick)
     },
-    markReview() {
-      this.cur.status = 'U'
-      logWarn('标记人工复核', this.cur.pick)
+
+    openCorrectDialog() {
+      this.correctKey = this.cur.pick
+      this.correctDialogVisible = true
     },
+
+    async submitCorrect() {
+      if (!this.correctKey.trim()) {
+        ElMessage.warning('请输入正确的减字名称')
+        return
+      }
+      this.submitting = true
+      try {
+        await submitCorrection({
+          image_url: this.backendImageUrl,
+          index: this.selectedIdx,
+          box: { x: this.cur.x, y: this.cur.y, w: this.cur.w, h: this.cur.h },
+          origin_key: this.cur.pick,
+          confirmed_key: this.correctKey.trim()
+        })
+        ElMessage.success('反馈已提交，感谢您的修正')
+        this.cur.pick = this.correctKey.trim()
+        this.cur.status = 'U'
+        this.correctDialogVisible = false
+      } catch (e) {
+        ElMessage.error('反馈提交失败，请联系开发人员')
+      } finally {
+        this.submitting = false
+      }
+    },
+
     clearAll() {
       this.items = []
       this.selectedIdx = null
-      logInfo('清除画布')
     },
+
     exportResult() {
       const lines = this.items.map((it, i) => {
         const rh = it.rhythm && it.rhythm !== 'C' ? `  [${it.rhythm}]` : ''
-        return `${String(i + 1).padStart(2, '0')}. ${it.pick}${rh}`
+        return `${String(i + 1).padStart(2, '0')}. ${it.parse_result.display_name}${rh}`
       })
-      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：${this.fromBackend ? '后端识别' : '演示数据'}\n\n${lines.join('\n')}\n`
+      const text = `泠弦智谱 · 打谱结果\n源文件：${this.fileName}\n数据来源：本地模型\n\n${lines.join('\n')}\n`
       const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
       a.download = 'lingxian_result.txt'
       a.click()
-      logInfo('导出打谱结果')
     }
   }
 }
 </script>
 
 <style scoped>
+.whole-sheet { padding: 4px 0; }
+.leaf :deep(.el-card__body) { padding: 16px 18px; }
+
 .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.fname { font-size: 12px; color: var(--ink-soft); }
+.fname {
+  font-family: 'SimSun', 'Songti SC', serif;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
 
-.work { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
-.canvas-card { flex: 2 1 440px; min-width: 0; }
-.panel-card { flex: 1 1 280px; min-width: 0; }
-.blank { margin-top: 14px; }
+.work { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+.canvas-card { flex: 2 1 460px; min-width: 0; }
+.panel-card { flex: 1 1 300px; min-width: 0; }
+.blank { margin-top: 16px; }
 
-.empty { color: var(--ink-soft); font-size: 13px; padding: 34px 0; text-align: center; line-height: 2; }
-.p-title { font-size: 15px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; font-family: 'KaiTi','STKaiti',serif; }
-.blk { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); margin: 16px 0 8px; }
-.cand { display: flex; margin: 0 8px 8px 0; }
-.conf { color: var(--ink-soft); font-size: 11px; }
+.p-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.22em;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line-soft);
+  margin-bottom: 4px;
+}
 
-.parse { font-size: 12.5px; line-height: 1.9; background: rgba(184,134,11,0.07); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
-.parse .meaning { color: var(--zhusha); margin-top: 4px; }
+.blk {
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.18em;
+  margin: 16px 0 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed var(--line-soft);
+}
+.blk-orn {
+  color: var(--zheshi);
+  font-size: 9px;
+  margin-right: 6px;
+  vertical-align: 2px;
+}
+.conf-inline {
+  float: right;
+  font-family: 'SimSun', 'Songti SC', serif;
+  font-size: 11.5px;
+  font-weight: normal;
+  color: var(--ink-faint);
+}
 
-.actions { margin-top: 16px; display: flex; gap: 8px; }
+.empty {
+  color: var(--ink-faint);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 13px;
+  text-align: center;
+  line-height: 2.2;
+  padding: 46px 0;
+}
 
-.seq-card { margin-top: 14px; }
+.hint-hint {
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  padding: 6px 0;
+}
+
+.cand { display: flex; margin: 0 8px 10px 0; font-family: 'SimSun', 'Songti SC', serif; }
+.conf { color: var(--ink-faint); font-size: 11px; margin-left: 4px; }
+
+.parse {
+  font-family: 'SimSun', 'Songti SC', serif;
+  font-size: 13px;
+  line-height: 2;
+  background-color: rgba(246, 238, 215, 0.55);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--zheshi);
+  border-radius: 2px;
+  padding: 12px 14px;
+}
+.parse-row .k {
+  display: inline-block;
+  width: 56px;
+  color: var(--ink-faint);
+  font-family: 'STKaiti', 'KaiTi', serif;
+  letter-spacing: 0.3em;
+}
+.parse .meaning {
+  color: var(--zhusha-deep);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line-soft);
+  font-family: 'STKaiti', 'KaiTi', '楷体', serif;
+}
+
+.actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.seq-card { margin-top: 16px; }
 .seq { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.seq-tag { font-family: monospace; letter-spacing: 0; }
-.rh { color: var(--zhusha); font-size: 12px; font-weight: 700; }
+.seq-tag { font-family: 'STKaiti', 'KaiTi', serif; font-size: 12px; }
+.rh {
+  color: var(--zhusha-deep);
+  font-family: 'STKaiti', 'KaiTi', serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 4px;
+}
 </style>

@@ -32,6 +32,7 @@ lightning_logs/
 *.tensorboard
 
 # ===== 临时上传 =====
+backend/static/
 backend/temp_upload/*
 !backend/temp_upload/.gitkeep
 
