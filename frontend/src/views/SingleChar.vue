@@ -11,6 +11,7 @@
 
   作者：@zlx @Wujee
   更新日期：2026-10-13
+  修订：2026-10-27 @zjx，修复 Vue 点击事件被误传为 engine。
   版本：1.1.0
 -->
 
@@ -33,7 +34,7 @@
             </div>
           </el-upload>
           <el-button type="primary" style="width:100%;margin-top:14px"
-                     :disabled="!imageUrl" :loading="recognizing" @click="recognize">
+                     :disabled="!imageUrl" :loading="recognizing" @click="recognize()">
             开始释读
           </el-button>
           <div class="engine-bar">
@@ -206,7 +207,7 @@ export default {
         },
         left_hand: lh
           ? { finger: lh.finger || '—', hui: lh.hui == null ? '—' : (/^\d+$/.test(String(lh.hui)) ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : String(lh.hui)) }
-          : { finger: '未明写', hui: '—' },
+          : { finger: p.knowledge_status === 'registry_candidate' || p.knowledge_status === 'unknown_key' ? '未核定' : '未明写', hui: '—' },
         meaning: p.meaning || '暂未收录该减字释义'
       }
     },

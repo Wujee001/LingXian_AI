@@ -12,7 +12,7 @@
 
   作者：@zlx
   创建日期：2026-10-13
-  版本：1.0.0
+  版本：1.1.0（2026-10-27 @zjx：目录与完整释义状态分离）
 -->
 
 <template>
@@ -38,14 +38,16 @@
               <el-radio-button label="泛音">泛音</el-radio-button>
               <el-radio-button label="装饰音">装饰音</el-radio-button>
               <el-radio-button label="复合音">复合音</el-radio-button>
+              <el-radio-button label="待复核">候选待复核</el-radio-button>
+              <el-radio-button label="已有释义">已有释义</el-radio-button>
             </el-radio-group>
           </div>
 
           <div class="blk2">
             <span v-if="loading">载入中…</span>
-            <span v-else>共 {{ list.length }} 条</span>
+            <span v-else>共 {{ list.length }} 条（已有详细释义 {{ detailCount }} 条）</span>
             <el-tag size="small" :type="fromBackend ? 'success' : 'warning'" class="src-tag">
-              {{ fromBackend ? '后端知识库' : '演示数据' }}
+              {{ fromBackend ? '类别目录 / 专业释义' : '演示数据' }}
             </el-tag>
           </div>
 
@@ -64,7 +66,7 @@
         </el-card>
       </el-col>
 
-      <!-- 右：详情 -->
+      <!-- 右：详情（仅原有25条拥有完整词条，新增类保留候选状态） -->
       <el-col :xs="24" :sm="14">
         <el-card shadow="never" class="leaf">
           <div v-if="!cur" class="empty">
@@ -75,6 +77,8 @@
             <div class="p-title">
               <span class="p-display">{{ cur.display }}</span>
               <el-tag size="small" type="info">{{ cur.type }}</el-tag>
+              <el-tag v-if="cur.knowledge_status === 'registry_candidate'" size="small" type="warning">详细释义待复核</el-tag>
+              <el-tag v-else size="small" type="success">已有详细词条</el-tag>
             </div>
             <div class="p-key">拼音 key：{{ cur.char_key }}</div>
 
@@ -90,11 +94,12 @@
             </div>
 
             <div class="blk"><span class="blk-orn">○</span> 标 记</div>
-            <div class="flags">
+            <div v-if="cur.knowledge_status !== 'registry_candidate'" class="flags">
               <span class="flag" :class="{ on: cur.is_san }">散音</span>
               <span class="flag" :class="{ on: cur.is_fan }">泛音</span>
               <span class="flag" :class="{ on: !cur.is_san && !cur.is_fan }">按音</span>
             </div>
+            <p v-else class="model-caution">音类、左右手及上下文关系尚未核对，不自动判断为按音或散音。</p>
           </template>
         </el-card>
       </el-col>
@@ -137,6 +142,11 @@ const FALLBACK = [
 
 export default {
   name: 'Knowledge',
+  computed: {
+    detailCount() {
+      return this.list.filter(item => item.knowledge_status !== 'registry_candidate').length
+    }
+  },
   data() {
     return {
       q: '',
@@ -203,7 +213,7 @@ export default {
     },
 
     async selectItem(item) {
-      if (item.meaning || item.right_hand !== undefined) {
+      if (item.knowledge_status || item.meaning || item.right_hand !== undefined) {
         this.cur = item
         return
       }
@@ -226,7 +236,7 @@ export default {
       return `${f} · ${s}`
     },
     fmtLh(lh) {
-      if (!lh) return '散音（不按弦）'
+      if (!lh) return this.cur?.knowledge_status === 'registry_candidate' ? '未核定' : '散音（不按弦）'
       const f = lh.finger || '—'
       const h = lh.hui != null ? (HUI_MAP[lh.hui] || lh.hui) + '徽' : '—'
       return `${f} · ${h}`

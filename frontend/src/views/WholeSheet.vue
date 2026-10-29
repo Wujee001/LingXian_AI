@@ -9,7 +9,7 @@
 
   作者：@zlx @Wujee
   更新日期：2026-10-13
-  版本：1.3.0（手动画框后自动识别）
+  版本：1.3.1（2026-10-27 @zjx：区分注册表候选与已有详细词条）
 -->
 
 <template>
@@ -79,7 +79,7 @@
               <label>完整减字知识库键（选填）</label>
               <el-input v-model="cur.pick" size="small" placeholder="可选：如 ming_10_gou_4"
                         @change="onKeyChanged" />
-              <span class="model-caution">只有与知识库匹配、经人工确认的完整类别才能送入句读模块。</span>
+              <span class="model-caution">新增类别仅有目录名称，确认类别不等于已有详细释义；句读仍需已有详细词条。</span>
             </div>
           </div>
           <!-- 识别中 -->
@@ -242,6 +242,7 @@ export default {
           candidates: (it.candidates || []).map(c => [c[0], c[1]]),
           pick: (it.candidates && it.candidates[0] && it.candidates[0][0]) || '待人工确认',
           key_verified: false,
+          knowledge_status: 'field_candidate',
           raw_label: it.raw_label || '',
           rhythm: 'U',
           rhythmConf: null,
@@ -292,6 +293,7 @@ export default {
         it.review_reasons = body.data.review_reasons || []
         it.status = 'U'
         it.key_verified = false
+        it.knowledge_status = 'field_candidate'
         logInfo('手动框识别完成', it.pick)
       } catch (e) {
         logWarn('手动框识别失败', e && e.message)
@@ -393,7 +395,7 @@ export default {
         },
         left_hand: lh
           ? { finger: lh.finger || '—', hui: lh.hui == null ? '—' : (/^\d+$/.test(String(lh.hui)) ? (HUI_MAP[lh.hui] || String(lh.hui)) + '徽' : String(lh.hui)) }
-          : { finger: '未明写', hui: '—' },
+          : { finger: p.knowledge_status === 'registry_candidate' || p.knowledge_status === 'unknown_key' ? '未核定' : '未明写', hui: '—' },
         meaning: p.meaning || '暂未收录该减字释义'
       }
     },
@@ -405,15 +407,24 @@ export default {
       if (!this.cur) return
       this.cur.status = 'U'
       this.cur.key_verified = false
+      this.cur.knowledge_status = 'unresolved'
       const key = (this.cur.pick || '').trim()
       if (!key || key === '待人工确认') return
       try {
         const res = await getKbItem(key)
-        this.cur.parse_result = this.fmtParse(res.data.data)
-        this.cur.key_verified = true
-        ElMessage.success('知识库已找到该减字，仍需点击确认')
+        const item = res?.data?.data
+        if (!item) throw new Error('类别查询结果为空')
+        this.cur.parse_result = this.fmtParse(item)
+        this.cur.knowledge_status = item.knowledge_status || 'legacy_detail'
+        if (this.cur.knowledge_status === 'registry_candidate') {
+          // 仅查到目录≠已有完整知识；人工可确认 key，但不能将其作为句读词条。
+          ElMessage.warning('已找到候选类别，详细释义待人工复核；确认后仍不自动送入句读')
+        } else {
+          this.cur.key_verified = true
+          ElMessage.success('找到已有详细词条，仍需人工确认')
+        }
       } catch (_) {
-        ElMessage.warning('知识库未找到该类别；可只保存八字段，不能自动句读')
+        ElMessage.warning('类别目录中未找到该key；请检查拼写或仅保存八字段')
       }
     },
     async onAttributeChanged() {
@@ -421,6 +432,7 @@ export default {
       this.cur.status = 'U'
       // 八字段修改后，原整字类别不再当然成立，必须重新核对。
       this.cur.key_verified = false
+      this.cur.knowledge_status = 'field_candidate'
       if (this.cur.pick && this.cur.pick !== '待人工确认') this.cur.pick = '待人工确认'
       try {
         const res = await parseAttributes(this.cur.attributes_selected)
@@ -436,6 +448,8 @@ export default {
         meaning: '切换候选后，该框释义以人工确认为准。'
       }
       this.cur.status = 'U'
+      this.cur.key_verified = false
+      this.cur.knowledge_status = 'unresolved'
       logWarn('切换识别候选', key)
     },
 
@@ -444,15 +458,24 @@ export default {
     },
 
     async confirmItem() {
-      if (this.cur.pick && this.cur.pick !== '待人工确认' && !this.cur.key_verified) {
+      const chosenKey = this.cur.pick && this.cur.pick !== '待人工确认' ? this.cur.pick : null
+      if (chosenKey && !this.cur.key_verified) {
         await this.onKeyChanged()
-        if (!this.cur.key_verified) {
-          ElMessage.warning('整字类别无法匹配知识库；请清空后只保存八字段，或填写正确类别键')
+        if (!this.cur.key_verified && this.cur.knowledge_status !== 'registry_candidate') {
+          ElMessage.warning('该类别尚未在目录中登记；请清空key后仅保存八字段')
           return
         }
       }
-      const ok = await this._reportCorrect(this.cur.pick === '待人工确认' ? null : this.cur.pick)
-      if (ok) { this.cur.status = 'A'; ElMessage.success('人工确认已保存') }
+      const ok = await this._reportCorrect(chosenKey)
+      if (ok) {
+        this.cur.status = 'A'
+        if (this.cur.knowledge_status === 'registry_candidate') {
+          this.cur.key_verified = false // 不得把仅有目录的类送入自动句读
+          ElMessage.success('已记录人工确认的类别；专业释义尚待审核')
+        } else {
+          ElMessage.success('人工确认已保存')
+        }
+      }
     },
     async markReview() {
       this.cur.status = 'U'
@@ -468,6 +491,8 @@ export default {
           origin_key: (this.cur.candidates && this.cur.candidates[0] && this.cur.candidates[0][0]) || null,
           confirmed_key: confirmedKey,
           source: this.source,
+          knowledge_status: this.cur.knowledge_status || 'unresolved',
+          needs_meaning_review: this.cur.knowledge_status === 'registry_candidate',
           attributes_selected: this.cur.attributes_selected,
           attributes_top3: this.cur.attributes_top3,
           detection_confidence: this.cur.detection_confidence,

@@ -15,91 +15,71 @@
     @Wujee
 
 创建日期：2026-10-08
-版本：1.0.1（整合 registry，移除重复 CSV 加载）
+版本：1.1.0（2026-10-27 @zjx：合并318类目录与25条已有详细释义）
 
 许可证：内部使用，未经许可不得传播。
 
 """
 
-import json
-from pathlib import Path
-
 from fastapi import APIRouter, HTTPException, Query
 
+from service.knowledge_catalog import get_knowledge, list_knowledge, knowledge_counts
 from service.registry import all_classes
 from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_WARN
 
 router = APIRouter()
 
-# 基于本文件位置定位数据文件，禁写死盘符
-_CORE_DIR = Path(__file__).resolve().parent.parent / "core"
-_LIB_PATH = _CORE_DIR / "jianzipu_lib.json"
-
-# 启动时加载语义库到内存（类别主表统一由 service.registry 缓存）
-_lib: dict = {}
-
-
-def _load_lib():
-    global _lib
-    try:
-        with open(_LIB_PATH, "r", encoding="utf-8") as f:
-            _lib = json.load(f)
-        MLN_LOG_INFO("知识库加载完成，共 %d 个减字", len(_lib))
-    except Exception as e:
-        MLN_LOG_WARN("知识库加载失败: %s", e)
-        _lib = {}
-
-
-_load_lib()
-
 
 @router.get("/library")
-def library(char_type: str = Query(None, description="按类型筛选：散音/按音/泛音/装饰音/复合音")):
-    """知识库列表，可按类型筛选"""
-    if char_type:
-        items = {k: v for k, v in _lib.items() if v.get("type") == char_type}
-        MLN_LOG_INFO("查询知识库列表，类型=%s，结果=%d", char_type, len(items))
-    else:
-        items = _lib
-        MLN_LOG_INFO("查询知识库列表，全部，结果=%d", len(items))
-    return {"success": True, "count": len(items), "data": items}
+def library(char_type: str | None = Query(None, description="按原有音类、候选类型或候选/已有详情筛选")):
+    """默认显示318条；新增293条仅为候选，不伪称有完整释义。"""
+    catalog = list_knowledge()
+    if char_type == "待复核":
+        catalog = {k: v for k, v in catalog.items() if v["knowledge_status"] == "registry_candidate"}
+    elif char_type == "已有释义":
+        catalog = {k: v for k, v in catalog.items() if v["knowledge_status"] == "legacy_detail"}
+    elif char_type:
+        catalog = {k: v for k, v in catalog.items() if v.get("type") == char_type}
+    MLN_LOG_INFO("查询减字目录：类型=%s，结果=%d", char_type or "全部", len(catalog))
+    return {"success": True, "count": len(catalog), "data": catalog}
 
 
 @router.get("/detail/{char_key}")
 def detail(char_key: str):
-    """单个减字完整解析"""
-    item = _lib.get(char_key)
-    if not item:
-        MLN_LOG_WARN("知识库未命中: %s", char_key)
-        raise HTTPException(status_code=404, detail=f"减字 {char_key} 未收录")
-    MLN_LOG_INFO("查询减字详情: %s", char_key)
+    item = get_knowledge(char_key)
+    if item is None:
+        MLN_LOG_WARN("类别目录未登记：%s", char_key)
+        raise HTTPException(status_code=404, detail=f"类别 {char_key} 未登记")
     return {"success": True, "data": item}
 
 
 @router.get("/search")
-def search(q: str = Query(..., min_length=1, description="搜索关键词")):
-    """模糊搜索：匹配 display / 指法 / 徽位 / 释义 / 拼音key"""
-    q_lower = q.lower()
+def search(q: str = Query(..., min_length=1, description="搜索 key、名称、演奏释义")):
+    query = q.strip().lower()
+    catalog = list_knowledge()
     results = {}
-    for key, item in _lib.items():
+    for key, item in catalog.items():
         rh = item.get("right_hand") or {}
         lh = item.get("left_hand") or {}
         haystack = " ".join([
-            str(item.get("display", "")),
-            str(item.get("type", "")),
-            str(item.get("meaning", "")),
-            str(rh.get("finger", "")),
-            str(lh.get("finger", "")),
+            key, str(item.get("display", "")), str(item.get("type", "")),
+            # 通用的「待复核」占位描述不可进入搜索，否则搜索「复」会命中全部候选。
+            str(item.get("meaning", "")) if item.get("knowledge_status") != "registry_candidate" else "",
+            str(rh.get("finger", "")), str(lh.get("finger", "")),
         ]).lower()
-        if q_lower in haystack or q_lower in key.lower():
+        if query in haystack:
             results[key] = item
-    MLN_LOG_INFO("知识库搜索 q=%s，结果=%d", q, len(results))
+    MLN_LOG_INFO("减字目录搜索 q=%s，结果=%d", q, len(results))
     return {"success": True, "count": len(results), "data": results}
 
 
 @router.get("/registry")
 def registry():
-    """类别主表（class_registry.csv，统一由 service.registry 加载）"""
     rows = all_classes()
-    MLN_LOG_INFO("查询类别主表，共 %d 类", len(rows))
     return {"success": True, "count": len(rows), "data": rows}
+
+
+@router.get("/coverage")
+def coverage():
+    """明确区分目录覆盖与详细释义覆盖，不将318条误称为知识库已完成。"""
+    return {"success": True, "data": knowledge_counts()}

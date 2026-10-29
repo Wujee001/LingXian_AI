@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """八字段候选的保守中文展示，不是完整的上下文/句读知识库推理。
 NA：本字未显写；OTHER：超出当前词表。不能把 NA 当成散音/零徽。
+2026-10-27 @zjx：明确字段候选状态，不将八字段自动猜成注册表中的完整类别。
 """
 from __future__ import annotations
 
@@ -57,4 +58,6 @@ def parse_attributes(attrs:dict) -> dict:
             'meaning': ('模型候选（待人工核对）：'+ '；'.join(summary) if summary else '模型未识别到可确认的显式属性')
                      +'。省写／承前位置、复合动作的语义及简谱节奏尚未由本模型确认。',
             'is_confirmed':False,
+            'knowledge_status':'field_candidate',
+            'needs_meaning_review':True,
             'origin':'stage2_model_candidate'}

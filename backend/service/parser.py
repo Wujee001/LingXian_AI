@@ -12,50 +12,33 @@ core/jianzipu_lib.json 知识库，未收录时返回占位结构，
     @Wujee
 
 创建日期：2026-10-1
-版本：1.0.0
+版本：1.1.0（2026-10-27 @zjx：新增注册表候选回退，不伪造释义）
 
 许可证：内部使用，未经许可不得传播。
 
 """
 
-import json
-import os
-
-from core.config import BACKEND_ROOT
+from service.knowledge_catalog import get_knowledge
 from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_WARN
-
-# 减字语义知识库
-_LIB_PATH = os.path.join(BACKEND_ROOT, "core", "jianzipu_lib.json")
-
-
-def _load_lib() -> dict:
-    """读取减字知识库，文件缺失或格式错误时返回空字典。"""
-    try:
-        with open(_LIB_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
 
 
 def char_parse(class_key: str) -> dict:
-    """
-    入参：
-        class_key：减字拼音编码，如 da_9_gou_4
-    返回：
-        演奏解析 {class_key, display_name, left_hand, right_hand, meaning}
-    """
-    lib = _load_lib()
-    item = lib.get(class_key)
+    """原有25条返回详细释义，其余注册表记录只返回待复核候选。"""
+    item = get_knowledge(class_key)
+    if item is not None:
+        if item["knowledge_status"] == "registry_candidate":
+            MLN_LOG_WARN("减字已列目录但详细释义待核：%s", class_key)
+        else:
+            MLN_LOG_INFO("解析已有知识词条：%s", class_key)
+        return item
 
-    if item is None:
-        MLN_LOG_WARN("知识库未收录减字：%s，返回占位", class_key)
-        return {
-            "class_key": class_key,
-            "display_name": class_key,
-            "left_hand": {},
-            "right_hand": {},
-            "meaning": "暂未收录该减字释义",
-        }
-
-    MLN_LOG_INFO("解析减字：%s", class_key)
-    return {"class_key": class_key, **item}
+    MLN_LOG_WARN("减字类别未登记：%s", class_key)
+    return {
+        "class_key": class_key,
+        "display_name": str(class_key),
+        "left_hand": None,
+        "right_hand": None,
+        "meaning": "该 class_key 尚未登记，请核对识别结果或人工选择类别。",
+        "knowledge_status": "unknown_key",
+        "needs_meaning_review": True,
+    }
