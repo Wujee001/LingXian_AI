@@ -347,7 +347,7 @@ if __name__ == "__main__":
     MlnLog.initialize(LogLevel.DEBUG, console=True)
 
     log = MlnLog.get_instance()
-    log.set_log_file("logs/mlnlog.log")
+    log.set_log_file("utils/logs/mlnlog.log")
 
     MLN_LOG_DEBUG("调试日志测试")
     MLN_LOG_INFO("信息日志测试")

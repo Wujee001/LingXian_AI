@@ -7,7 +7,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from PIL import Image
 
-from core.config import UPLOAD_DIR
+from core.config import UPLOAD_DIR, LOG_DIR
 from service.parser import char_parse
 from service import correction_store
 from utils.mlnlog import MLN_LOG_INFO, MLN_LOG_EXCEPTION, MLN_LOG_WARN
@@ -114,11 +114,12 @@ def _recognize(save_path: str, sheet_img: Image.Image):
 
 @router.post("/correct")
 async def sheet_correct(payload: dict):
-    """人工修正，追加写入feedback.txt（git跟踪）"""
+    """人工修正，追加写入 utils/logs/feedback.txt，并落库 corrections.json"""
     total = correction_store.append(payload)
     feedback_line = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 图={payload.get('image_url')} 框#{payload.get('index')} 原识别={payload.get('origin_key')} → 人工修正={payload.get('confirmed_key')}\n"
-    # 写入backend根目录feedback.txt
-    feedback_path = os.path.join(os.path.dirname(os.path.dirname(UPLOAD_DIR)), "feedback.txt")
+    # 统一写入 backend/utils/logs/feedback.txt
+    os.makedirs(LOG_DIR, exist_ok=True)
+    feedback_path = os.path.join(LOG_DIR, "feedback.txt")
     with open(feedback_path, "a", encoding="utf-8") as f:
         f.write(feedback_line)
     MLN_LOG_INFO("人工修正已记录：%s", feedback_line.strip())

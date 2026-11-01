@@ -15,7 +15,7 @@ venv/
 env/
 ENV/
 
-# ===== 模型权重（走GitHub Release，不进Git）=====
+# ===== 模型权重（网盘/本地拷贝转存，不进Git）=====
 backend/models/*.pth
 backend/models/*.pt
 backend/models/*.onnx
@@ -36,11 +36,10 @@ backend/static/
 backend/temp_upload/*
 !backend/temp_upload/.gitkeep
 
-# ===== 运行日志 =====
+# ===== 运行日志（统一 backend/utils/logs，*.log 不进Git；feedback.txt 保留跟踪）=====
 logs/
 *.log
-backend/logs/*
-!backend/logs/.gitkeep
+backend/utils/logs/*.log
 
 # ===== 数据集图片（走网盘，不进Git）=====
 data/dataset/*

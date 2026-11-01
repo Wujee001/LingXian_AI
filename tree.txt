@@ -1,181 +1,150 @@
 LingXian_AI_V1.0/                          # 泠弦智谱 LingXianAI 项目根目录
 │
-│  .gitignore                              # Git忽略规则（权重/数据集/node_modules/db/logs）
+│  .gitignore                              # Git忽略规则（权重/日志/上传图/数据集/打包产物）
 │  README.md                               # 项目说明 + 启动步骤
-│  requirements.txt                        # Python后端依赖清单（fastapi/uvicorn/opencv/ultralytics）
+│  requirements.txt                        # Python后端依赖（fastapi/uvicorn/opencv/ultralytics）
 │  tree.txt                                # 项目目录树（本文件）
 │
 ├─backend/                                 # ===== FastAPI 后端 =====
-│  │  main.py                              # FastAPI入口（挂载路由 + /static静态目录 + CORS + 日志初始化）
-│  │  __init__.py                          # 后端包标识
+│  │  main.py                              # FastAPI入口（CORS + /static + 日志 + 4路由 + 启动预加载Stage2）
+│  │  __init__.py
 │  │
 │  ├─api/                                  # 接口路由层
-│  │      knowledge.py                     # 知识库 查询/浏览/搜索/注册表 接口
-│  │      single_char.py                   # 单减字识别 /api/char/predict（engine=auto/yolo/qwen，三级降级）
-│  │      whole_sheet.py                   # 整谱打谱 /api/sheet/upload（engine切换，YOLO出框+逐框认字）+ /correct 人工修正
-│  │      judou.py                         # 智能句读 /api/judou/segment（多模态优先→规则兜底）
-│  │      __init__.py                      # 路由包标识
+│  │      single_char.py                   # 单减字识别 POST /api/char/predict（纯本地两阶段）
+│  │      whole_sheet.py                   # 整谱打谱 POST /api/sheet/upload + /correct（人工修正）
+│  │      knowledge.py                     # 知识库 GET /api/knowledge/library|detail|search|registry
+│  │      judou.py                         # 智能句读 POST /api/judou/segment（本地规则引擎）
+│  │      __init__.py
 │  │
-│  ├─core/                                 # 配置与静态资源
-│  │      config.py                        # 全局配置（全部相对路径，禁写死盘符；启动自动建目录）
-│  │      jianzipu_lib.json                # 减字语义知识库（减字→左右手/徽位/释义），25 类
-│  │      __init__.py                      # core包标识
+│  ├─core/                                 # 配置与语义资源
+│  │      config.py                        # 全局路径（基于文件位置，禁写死盘符，启动自动建目录）
+│  │      jianzipu_lib.json                # 减字语义知识库 178 条（左右手/徽位/释义）
+│  │      __init__.py
 │  │
-│  ├─data/                                 # 后端数据
-│  │      class_registry.csv               # 类别主表（class_id/class_key/display_name/category/active，25 类）
-│  │      corrections.json                 # 人工修正回流库（运行期自动生成，追加带时间戳）
+│  ├─data/                                 # 后端业务数据
+│  │      class_registry.csv               # 类别主表 178 类（class_id/class_key/display_name/category/active）
 │  │
-│  ├─logs/                                 # 运行日志输出目录（.gitignore）
-│  │      mlnlog.log                       # 后端统一日志（mlnlog：控制台彩色+文件持久化）
+│  ├─models/                               # 模型权重（.gitignore，不进Git，网盘/本地拷贝转存）
+│  │      best.pt                          # Stage1 YOLO 检测权重（1类，纯出减字框，约5.6MB）
+│  │      stage2_best.pth                  # Stage2 多头ResNet18（8头识别指法/弦/徽，约45MB）
 │  │
-│  ├─models/                               # 模型权重目录（.gitignore，大文件走GitHub Release）
-│  │      best.pt                          # 队友训练的 YOLO 权重（279类细标签，检测可用、分类待补样本，约5.6MB）
-│  │
-│  ├─modules/                              # ===== 智能句读算法模块（V2实现，V1 暂为空壳） =====
+│  ├─modules/                              # 智能句读算法模块（V2实现，当前为空壳）
 │  │  │  __init__.py
-│  │  │
-│  │  ├─state_transfer/                    # 数学建模：演奏状态转移
-│  │  │      feature_extractor.py          # Δz 特征提取（换弦/徽位变化/指法连续度等数值向量）
-│  │  │      baseline_model.py             # 可解释基线模型（Logistic/专家规则，消融对照用）
+│  │  ├─state_transfer/
+│  │  │      feature_extractor.py          # Δz 特征提取（换弦/徽位变化/指法连续度）
+│  │  │      baseline_model.py             # 可解释基线（Logistic/专家规则，消融对照）
 │  │  │      __init__.py
-│  │  │
-│  │  ├─judou/                             # 汉语言句读启发特征
-│  │  │      rules.py                      # 句读规则打分（结构完整度/边界标志/层级/歧义度）
-│  │  │      features.py                   # 合成句读启发向量 q_i
+│  │  ├─judou/
+│  │  │      rules.py                      # 句读规则打分
+│  │  │      features.py                   # 句读启发向量 q_i
 │  │  │      __init__.py
-│  │  │
-│  │  └─sequence/                          # 序列融合与决策
+│  │  └─sequence/
 │  │         fusion.py                     # 特征融合 [z_i, Δz_i, q_i]
 │  │         transformer_model.py          # 轻量序列模型，输出 C/S/L/E 概率
-│  │         decision.py                   # 决策引擎（maxP<τ → U 人工复核，概率约束校验）
+│  │         decision.py                   # 决策引擎（maxP<τ → U 人工复核）
 │  │         __init__.py
 │  │
-│  ├─service/                              # 业务逻辑层（识别三级降级核心）
-│  │      yolo_infer.py                    # 【一级】本地 YOLO 推理（best.pt 实为279类细标签；负责出框+竖排排序，仅保留能对上25类的key，另存raw_label）
-│  │      qwen_adapter.py                  # 【二级】阿里云多模态 qwen3-omni-flash（urllib直连，零依赖，额度熔断，key归一化，实测1~2s）
-│  │      classifier.py                    # 单减字分类统一入口 predict_crop(pil, engine=auto/yolo/qwen) + get_last_source
-│  │      detector.py                      # 【降级】OpenCV 规则检测出框（np.fromfile+imdecode，兼容中文路径）
-│  │      correction_store.py              # 人工修正落库 corrections.json（线程锁、追加、时间戳）
-│  │      parser.py                        # 减字解析（识别结果→查知识库→演奏状态 z_i）
-│  │      registry.py                      # 类别注册表加载（读 class_registry.csv，带缓存）
-│  │      __init__.py                      # service包标识
+│  ├─service/                              # 业务逻辑层
+│  │      yolo_infer.py                    # Stage1 YOLO 推理（懒加载单例，出框+竖排右起排序，CPU）
+│  │      stage2_infer.py                  # Stage2 多头ResNet18 推理（8头软最大→拼key）
+│  │      detector.py                      # OpenCV 规则检测出框（备用，np.fromfile兼容中文路径）
+│  │      parser.py                        # 减字key归一化 → 查知识库 → 中文释义
+│  │      registry.py                      # 类别主表加载（带缓存，唯一CSV入口）
+│  │      correction_store.py              # 人工修正落库（线程锁，运行时生成 corrections.json）
+│  │      __init__.py
 │  │
-│  ├─static/                               # 静态资源目录（上传图片访问、静态文件托管）
-│  │  └─upload/                            # 上传图片静态访问目录（/static/upload/<uuid>.<ext>）
+│  ├─static/                               # 静态资源（.gitignore，整目录不进Git）
+│  │  └─upload/                            # 上传图 /static/upload/<uuid>.<ext>
 │  │
-│  ├─temp_upload/                          # 用户上传图片临时目录（.gitignore）
-│  │      .gitkeep                         # 空目录占位
+│  ├─temp_upload/                          # 临时处理目录（.gitignore）
+│  │      .gitkeep
 │  │
-│  └─utils/                                # 通用工具模块
-│          mlnlog.py                       # 日志系统（彩色控制台+文件持久化+热重载）
-│          __init__.py                     # utils包标识
+│  ├─utils/                                # 通用工具
+│  │  │  mlnlog.py                         # 日志系统（彩色控制台 + 文件持久化 + 热重载）
+│  │  │  __init__.py
+│  │  └─logs/                              # 统一日志/反馈目录
+│  │         mlnlog.log                    # 运行日志（*.log 不进Git）
+│  │         feedback.txt                  # 人工修正反馈（保留Git跟踪，运行时追加）
+│  │
+│  ├─build/                                # PyInstaller 打包产物（.gitignore，不进Git）
+│  └─dist/                                 # 打包输出（.gitignore，不进Git）
 │
-├─data/                                    # ===== 数据集 =====
-│  └─dataset/                              # 裁剪单字图片（文件夹名=拼音类别，走网盘不进Git）
-│          .gitkeep                        # 空目录占位
+├─data/
+│  └─dataset/                              # 训练数据集（.gitignore，图片走网盘）
+│         .gitkeep
 │
-├─docs/                                    # ===== 项目文档 =====
-│      ARCHITECTURE.md                     # 项目整体架构设计文档
-│      团队分工.md                          # 协作分工 + Git分支规范
-│      接口契约.md                          # 软件↔模型接缝契约（交付物清单）
-│      句读规则手册.md                      # 句读原则→可计算字段映射表（上下文/结构完整/标志结构/层级/歧义）
-│      迭代规划.md                          # V1/V2 迭代规划
+├─docs/                                    # 项目文档
+│      ARCHITECTURE.md                     # 整体架构设计
+│      接口契约.md                          # 软件↔模型接口约定
+│      句读规则手册.md                      # 句读规则与标注规范
+│      近期规划.md                          # V1工作流与迭代规划
 │
 ├─frontend/                                # ===== Vue3 + Element-Plus 前端 =====
 │  │  index.html                           # HTML入口
-│  │  package.json                         # 前端依赖配置
-│  │  package-lock.json                   # npm依赖版本锁定文件
-│  │  vite.config.js                       # Vite配置（/api 与 /static 代理到后端8001端口）
+│  │  package.json                         # 依赖配置
+│  │  package-lock.json                    # 依赖版本锁定
+│  │  vite.config.js                       # Vite配置（/api、/static 代理到8001）
 │  │
-│  └─src/                                  # 前端源码
-│      │  App.vue                          # 根组件（国风导航布局+四功能页签）
-│      │  main.js                          # 前端入口（挂载ElementPlus + 路由）
-│      │  style.css                        # 全局国风样式（宣纸+墨色+朱砂）
-│      │  logger.js                        # 前端操作埋点（后端统一由mlnlog持久化）
+│  ├─public/
+│  │      bg.jpg                           # 宣纸水彩古琴背景图
+│  │
+│  └─src/
+│      │  App.vue                          # 根组件（书名区 + 4 Tab木牌导航 + keep-alive）
+│      │  main.js                          # 入口（挂载 ElementPlus + 路由）
+│      │  style.css                        # 全局国风样式（宣纸/墨色/朱砂）
+│      │  logger.js                        # 前端操作埋点（控制台）
 │      │
-│      ├─api/                              # API请求封装
-│      │      index.js                     # axios统一封装（识别/知识库/整谱/句读/修正接口，分级超时）
-│      │
-│      ├─components/                       # 公共组件
-│      │      SheetCanvas.vue              # 谱图画布组件（框选、拖拽、新增删除、交互）
-│      │
-│      ├─router/                           # 路由配置
-│      │      index.js                     # 路由表（单减字/整谱打谱/智能句读/知识库）
-│      │
-│      └─views/                            # 页面
-│              SingleChar.vue              # 【单减字识别】上传单字→Top3候选+释义（引擎切换 自动/本地/多模态 + 多模态重认）
-│              WholeSheet.vue              # 【整谱打谱】检测+识别+指法+句读+人工修正+导出（引擎切换，单框多模态重认）
-│              Judou.vue                   # 【智能句读】独立页：逐字 C/S/L/E/U 标注+人工复核
-│              Knowledge.vue               # 【知识库】减字库浏览/检索/详情
-│              JudouSegment.vue            # 废弃空壳（无路由引用，保留）
+│      ├─api/index.js                      # axios 接口统一封装（含异常拦截）
+│      ├─router/index.js                   # Hash 路由（4 页）
+│      ├─components/
+│      │      SheetCanvas.vue              # 谱图画布（选框/拖拽/删框/画框）
+│      └─views/
+│             SingleChar.vue               # 单减字识别页
+│             WholeSheet.vue               # 整谱打谱页
+│             Knowledge.vue                # 减字知识库页
+│             Judou.vue                    # 智能句读页
+│             JudouSegment.vue             # 废弃空壳（无路由引用，保留）
 │
-├─scripts/                                 # ===== 训练脚本（训练在Colab GPU，推理在本地CPU） =====
-│      train_colab.ipynb                   # Colab/AI Studio 迁移学习脚本（ResNet18 单字分类）
-│      train_sequence.ipynb                # 句读序列模型训练脚本（Baseline/Transformer 消融对照）
+├─scripts/                                 # 训练脚本（训练在GPU，推理在本地CPU）
+│      train_colab.ipynb                   # 迁移学习（ResNet18 单字分类）
+│      train_sequence.ipynb                # 句读序列模型（Baseline/Transformer）
 │
-└─tests/                                   # ===== 测试 =====
-        .gitkeep                           # 空目录占位
+└─tests/                                   # 测试
+        .gitkeep
+
+
 ============================================================
   关键说明
 ============================================================
-【五大功能与识别三级降级】
-  功能：①单减字识别 ②整谱打谱 ③人工修正 ④知识库 ⑤智能句读
-  识别降级（任一级失败自动落到下一级，前端标签显示来源 yolo/qwen/fake）：
-    一级 YOLO 本地权重 best.pt（service/yolo_infer.py，CPU 推理，需 pip install ultralytics）
-    二级 阿里云多模态 qwen3-omni-flash（service/qwen_adapter.py，读环境变量
-         DASHSCOPE_API_KEY，免费额度用完即停；HTTP403/401/429 自动熔断；urllib 零依赖；
-         图片发送前压缩至长边960/JPEG；qwen3.8-omni-flash 偏慢仅留备选，qwen-mt-uni 为翻译模型不可用）
-    三级 内置假数据（固定候选/规则句读），保证无网络、无权重时仍可演示
-  识别引擎手动切换（前端单字页/整谱页可选，表单字段 engine）：
-    auto 自动：YOLO 出框，能对上25类基础key的框用本地，其余框自动补多模态认字
-    yolo 本地模型：仅本地、不联网不耗额度；对不上的细类框置空并标 U（显示模型初判）
-    qwen 多模态：YOLO 负责出框、逐框裁剪交多模态认字（当前最准，耗额度，整谱较慢）
-    注：best.pt 实测为 279 类细粒度中文标签（含弦/徽/指法，非25类基础key），
-        检测框可用（XWC.png 出38框），但分类因训练样本不足、当前对不上基础key，
-        故 V1 以「YOLO出框 + 多模态认字」为准；单框也可点「多模态重认」。
-  整谱：各引擎均优先 YOLO 出框；YOLO 不可用则 OpenCV 规则出框（detector）后逐框分类
-  人工修正：/api/sheet/correct → correction_store.py 落库 data/corrections.json
-【C/S/L/E/U 边界标签】（标记两个相邻减字之间的停顿）
-  C Continue  连续   —— 不建议停顿，演奏连贯
-  S Short     短停   —— 弱边界，非句末小停顿
-  L Long      长停   —— 强边界，非句末大停顿
-  E End       句末   —— 完整谱乐句结束
-  U Review    复核   —— 非音乐标签；置信度低或存在专业歧义时转人工
-  约束：P(E) ≤ P(S)+P(L)+P(E)，保证"不是边界却判为句末"的逻辑矛盾不出现
-【三层技术架构】
-  第一层 演奏语义层：减字 → parser → 演奏状态 z_i（左手/右手/弦/徽/散按泛）
-  第二层 结构句读层：
-        古琴知识 → state_transfer/feature_extractor → 状态转移 Δz_i
-        汉语言句读 → judou/rules+features → 句读启发特征 q_i
-  第三层 序列推断层：fusion 拼接 [z_i, Δz_i, q_i] → sequence/transformer_model → P(C/S/L/E)
-                    → decision 按阈值与约束输出标签，低置信/歧义 → U
-  注：V1 句读直接用多模态 qwen3-omni-flash 输出 C/S/L/E；modules/ 内算法为 V2 预留空壳
-【双模型对照（消融实验，写论文用）】
-  Baseline：baseline_model.py 仅用 Δz_i，可解释、易复现
-  序列模型：transformer_model.py 用 [z_i, Δz_i, q_i] 学习上下文
-  两者对比：证明领域特征与序列建模各自贡献，无论谁高都可成结论
-【模型可插拔原则】
-  yolo_infer / classifier.predict_crop / qwen_adapter / baseline_model / transformer_model
-  均为独立替换点，上层接口、decision、前端不动，仅替换内部实现即可切换模型
-【视觉与乐理分离原则】
-  视觉模型只认字形（输出拼音 class_key）
-  乐理全部交给 jianzipu_lib.json（左手弦/徽 + 右手指法 + 释义）
-  class_registry.csv 为软件与模型共用的唯一类别主表
-【上传约定】
-  支持 .png / .jpg / .jpeg；后端扩展名白名单 + UUID 重命名 + PIL 校验，防中文路径问题
-【端口约定】
-  后端 FastAPI：http://127.0.0.1:8001
-  前端 Vite：   http://127.0.0.1:5173
-  API文档：     http://127.0.0.1:8001/docs
-【启动命令】
-  后端（首次需先装 YOLO 依赖）：
-        conda activate lingxian
-        pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-        pip install ultralytics          # 不装也能跑，会自动降级到多模态/假数据
-        cd backend
-        python main.py
-  前端：cd frontend
-        npm install
-        npm run dev
-  多模态密钥（PowerShell 当前用户永久生效）：
-        [Environment]::SetEnvironmentVariable("DASHSCOPE_API_KEY","你的key","User")
+
+【两阶段本地推理（无外网云API、无假数据兜底）】
+  Stage1 YOLO best.pt：检测减字位置框，竖排右起排序；模型仅1类，不负责分类。
+  Stage2 多头ResNet18 stage2_best.pth：对每个裁剪框输出8个属性头
+        （rh/string/lh/hui_base/hui_frac/mod/tone/strings），
+        取前5头拼 key，经 parser 归一化后查 jianzipu_lib.json 得中文释义。
+  模型未就绪 / 权重缺失：接口直接返回 503/500，提示联系开发人员，不返回假数据。
+
+【类别主表 class_registry.csv，178 类】
+  category 分布：single 23、modifier_only 1、compound 1、
+        散音 13、按音 44、泛音 43、装饰音 11、复合音 42。
+  软件线与模型线共用唯一主表，class_key 拼音编码，中文仅作显示，禁止自造类别。
+
+【C/S/L/E/U 句读标签】（标记相邻减字之间的停顿）
+  C 连续 / S 短停 / L 长停 / E 句末 / U 人工复核。
+  V1 用 judou.py 本地规则（复合长指法→E，走手修饰音→S，8字/4字兜底）；
+  modules 算法与训练权重为 V2 预留。
+
+【日志与反馈路径（统一 backend/utils/logs/）】
+  mlnlog.log：运行日志，*.log 不进 Git；文件为 UTF-8，
+        PowerShell 查看用 Get-Content -Encoding UTF8，避免中文乱码。
+  feedback.txt：人工修正反馈，保留 Git 跟踪。
+
+【权重转存】
+  权重不进 Git，通过网盘 / U盘 / 本地拷贝等方式在团队间转存更新，
+  放入 backend/models/ 即可被自动加载，无需改代码。
+
+【端口与启动】
+  后端 FastAPI http://127.0.0.1:8001 （API文档 /docs）
+  前端 Vite    http://127.0.0.1:5173
+  后端：conda activate lingxian && cd backend && python main.py
+  前端：cd frontend && npm install && npm run dev

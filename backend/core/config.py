@@ -34,8 +34,8 @@ TEMP_DIR = os.path.join(BACKEND_ROOT, "temp_upload")
 # 模型权重目录（.gitignore，走 GitHub Release）
 MODEL_DIR = os.path.join(BACKEND_ROOT, "models")
 
-# 日志输出目录（.gitignore）
-LOG_DIR = os.path.join(BACKEND_ROOT, "logs")
+# 日志输出目录（统一放在 utils/logs，.gitignore 忽略 *.log）
+LOG_DIR = os.path.join(BACKEND_ROOT, "utils", "logs")
 
 # 后端业务数据目录（class_registry.csv、知识库）
 DATA_DIR = os.path.join(BACKEND_ROOT, "data")

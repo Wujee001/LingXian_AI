@@ -21,10 +21,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from utils.mlnlog import MlnLog, LogLevel
+from core.config import LOG_DIR
 from api import whole_sheet, single_char, knowledge, judou
 
 app = FastAPI(title="LingXianAI 泠弦智谱", version="1.0.0")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5173"],
@@ -33,9 +33,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 全局开启文件日志
+# 全局开启文件日志（统一写入 backend/utils/logs，用绝对路径，不依赖启动目录）
 log_ins = MlnLog.initialize(level=LogLevel.DEBUG, console=True)
-log_ins.set_log_file("logs/mlnlog.log")
+log_ins.set_log_file(os.path.join(LOG_DIR, "mlnlog.log"))
 
 # 静态资源（上传的整谱图）
 os.makedirs("static/upload", exist_ok=True)
